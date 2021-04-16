@@ -18,7 +18,15 @@ class Navbar extends Component {
         this.valPasword = this.valPasword.bind(this);
         this.valMail = this.valMail.bind(this);
     }
-
+    componentDidMount() {
+        const query = new URLSearchParams(window.location.search);
+        const token = query.get('confirmAcct')
+        console.log(token)//Pensemeos que hacemos un llamado a la API y confirmamos confirmamos
+        //Por el momento si token = 1 entonces => Confirmado otherwise no confirmado
+        if(token == 1){
+            document.getElementById("opLeft").style.visibility = "hidden";//
+        }
+    }
     showModal = () => {
         var target = document.getElementById('modal');
         document.documentElement.classList.add("is-clipped");
@@ -114,7 +122,7 @@ class Navbar extends Component {
                                 </p>
                             </div>
                         </div>
-                        <div class="navbar-end">
+                        <div id="opLeft" class="navbar-end">
                             <Link to="/" class="navbar-item is-active">
                                 Inicio
                             </Link>
