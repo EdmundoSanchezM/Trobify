@@ -8,14 +8,17 @@ class Navbar extends Component {
         this.state = {
             isActive: false,
             nombre: '',
+            apellido: '',
             numero: '',
-            correo: ''
+            correo: '',
         };
         this.showModal = this.showModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.valName = this.valName.bind(this);
+        this.valApellido = this.valApellido.bind(this);
         this.valNumber = this.valNumber.bind(this);
-        this.valPasword = this.valPasword.bind(this);
+        this.valPasswordI = this.valPasswordI.bind(this);
+        this.valPassword = this.valPassword.bind(this);
         this.valMail = this.valMail.bind(this);
     }
     componentDidMount() {
@@ -23,7 +26,7 @@ class Navbar extends Component {
         const token = query.get('confirmAcct')
         console.log(token)//Pensemeos que hacemos un llamado a la API y confirmamos confirmamos
         //Por el momento si token = 1 entonces => Confirmado otherwise no confirmado
-        if(token == 1){
+        if (token == 1) {
             document.getElementById("opLeft").style.visibility = "hidden";//
         }
     }
@@ -37,6 +40,13 @@ class Navbar extends Component {
         var target = document.getElementById('modal');
         target.classList.remove("is-active");
         document.documentElement.classList.remove("is-clipped");
+    }
+
+    valApellido = (e) =>{
+        const re = /^[a-zA-Z\s\u00C0-\u00FF]*$/;
+        if (e.target.value === '' || re.test(e.target.value)) {
+            this.setState({ apellido: [e.target.value] })
+        }
     }
 
     valName = (e) => {
@@ -71,13 +81,52 @@ class Navbar extends Component {
         )
     }
 
-    valPasword = (e) => {
+    valPasswordI = (e) => {
+        let pass_o = document.getElementById("passO").value
+        const re8caracter = new RegExp("[a-zA-Z0-9]{8,}");
+        const letraMin = new RegExp("(?=.*[a-z])");
+        const letraMay= new RegExp("(?=.*[A-Z])");
+        const unDig = new RegExp("(?=.*[0-9])");
+        const carEspecial = new RegExp("(?=.*[!@#$%^&*:])");
+
+        var showMessage = document.getElementById("msgPassO")
+        showMessage.classList.remove("is-success")
+        showMessage.classList.remove("is-danger")
+        var message = [' 8 caracteres', ' al menos una letra mayúscula',
+            ' al menos una letra minúscula', ' un número', ' un símbolo (!, @, #, $, %, ^, &, *, :)']
+        const auxmessage = [' 8 caracteres', ' al menos una letra mayúscula',
+        ' al menos una letra minúscula', ' un número', ' un símbolo (!, @, #, $, %, ^, &, *, :)']
+        if (re8caracter.test(pass_o)) {
+            message.splice(message.indexOf(auxmessage[0]), 1)
+        }
+        if (letraMay.test(pass_o)) {
+            message.splice(message.indexOf(auxmessage[1]), 1)
+        }
+        if (letraMin.test(pass_o)) {
+            message.splice(message.indexOf(auxmessage[2]), 1)
+        }
+        if (unDig.test(pass_o)) {
+            message.splice(message.indexOf(auxmessage[3]), 1)
+        }
+        if (carEspecial.test(pass_o)) {
+            message.splice(message.indexOf(auxmessage[4]), 1)
+
+        }
+        if (message.length === 0) {
+            showMessage.innerHTML = "Contraseña con formato valido"
+            showMessage.classList.add("is-success")
+        } else {
+            showMessage.innerHTML = "Debe de contener:" + message.join()
+            showMessage.classList.add("is-danger")
+        }
+    }
+    valPassword = (e) => {
         let pass_o = document.getElementById("passO").value
         let pass_c = document.getElementById("passC").value
         var showMessage = document.getElementById("msgPassC")
         showMessage.classList.remove("is-success")
         showMessage.classList.remove("is-danger")
-        if (pass_o.includes(pass_c)) {
+        if (pass_o === pass_c) {
             showMessage.innerHTML = "Las contraseñas coinciden."
             showMessage.classList.add("is-success")
         } else {
@@ -145,7 +194,15 @@ class Navbar extends Component {
                             <div class="content is-centered">
                                 <div class="field">
                                     <p class="control has-icons-left has-icons-right">
-                                        <input class="input" type="text" placeholder="Tu nombre" value={this.state.nombre} onChange={this.valName} />
+                                        <input class="input" type="text" placeholder="Tus nombres" value={this.state.nombre} onChange={this.valName} />
+                                        <span class="icon is-small is-left">
+                                            <i class="fa fa-user"></i>
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <p class="control has-icons-left has-icons-right">
+                                        <input class="input" type="text" placeholder="Tus apellidos" value={this.state.apellido} onChange={this.valApellido} />
                                         <span class="icon is-small is-left">
                                             <i class="fa fa-user"></i>
                                         </span>
@@ -162,15 +219,16 @@ class Navbar extends Component {
                                 </div>
                                 <div class="field">
                                     <p class="control has-icons-left">
-                                        <input id="passO" class="input" type="password" placeholder="Tu contraseña" />
+                                        <input id="passO" class="input" type="password" placeholder="Tu contraseña" onChange={this.valPasswordI} />
                                         <span class="icon is-medium is-left">
                                             <i class="fa fa-lock"></i>
                                         </span>
                                     </p>
+                                    <p id="msgPassO" class="help"></p>
                                 </div>
                                 <div class="field">
                                     <p class="control has-icons-left">
-                                        <input id="passC" class="input" type="password" placeholder="Repite tu contraseña" onChange={this.valPasword} />
+                                        <input id="passC" class="input" type="password" placeholder="Repite tu contraseña" onChange={this.valPassword} />
                                         <span class="icon is-medium is-left">
                                             <i class="fa fa-lock"></i>
                                         </span>
