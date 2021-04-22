@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import Logo from 'resources/images/Logo.jpg'
+import Swal from 'sweetalert2'
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
 
 class Navbar extends Component {
     constructor(props) {
@@ -11,16 +14,29 @@ class Navbar extends Component {
             apellido: '',
             numero: '',
             correo: '',
+            contraseña: '',
+            dataImagen: '',
+            image: '',
+            cropData: "#",
+            cropper: '',
+            statusForm: [false, false, false, false, false, false] //Que estoy haciendo con mi vida unu?
+            //Como sea, valores para validar, orden: Nombre,apellido, email, pass, cel, img
         };
         this.showModal = this.showModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
+        this.showModal_image = this.showModal_image.bind(this);
+        this.closeModal_image = this.closeModal_image.bind(this);
         this.valName = this.valName.bind(this);
         this.valApellido = this.valApellido.bind(this);
         this.valNumber = this.valNumber.bind(this);
         this.valPasswordI = this.valPasswordI.bind(this);
         this.valPassword = this.valPassword.bind(this);
         this.valMail = this.valMail.bind(this);
+        this.cAName = this.cAName.bind(this);
+        this.getCropData = this.getCropData.bind(this);
+        this.hacerRegistro = this.hacerRegistro.bind(this);
     }
+
     componentDidMount() {
         const query = new URLSearchParams(window.location.search);
         const token = query.get('confirmAcct')
@@ -30,6 +46,18 @@ class Navbar extends Component {
             document.getElementById("opLeft").style.visibility = "hidden";//
         }
     }
+
+    getCropData = () => {
+        if (typeof this.state.cropper !== "undefined") {
+            this.setState({ cropData: this.state.cropper.getCroppedCanvas().toDataURL() },
+                () => {
+                    document.getElementById('msgImage').innerHTML = '<img src=' + this.state.cropData + ' id=putita />';
+                    this.closeModal_image()
+                }
+            );
+        }
+    };
+
     showModal = () => {
         var target = document.getElementById('modal');
         document.documentElement.classList.add("is-clipped");
@@ -42,24 +70,42 @@ class Navbar extends Component {
         document.documentElement.classList.remove("is-clipped");
     }
 
-    valApellido = (e) =>{
+    showModal_image = () => {
+        var target = document.getElementById('modal_image');
+        document.documentElement.classList.add("is-clipped");
+        target.classList.add("is-active");
+    }
+
+    closeModal_image = () => {
+        var target = document.getElementById('modal_image');
+        target.classList.remove("is-active");
+        document.documentElement.classList.remove("is-clipped");
+    }
+
+    valApellido = (e) => {
         const re = /^[a-zA-Z\s\u00C0-\u00FF]*$/;
+        var sForm = this.state.statusForm
         if (e.target.value === '' || re.test(e.target.value)) {
-            this.setState({ apellido: [e.target.value] })
+            sForm[1] = true
+            this.setState({ apellido: [e.target.value], statusForm: sForm })
         }
     }
 
     valName = (e) => {
         const re = /^[a-zA-Z\s\u00C0-\u00FF]*$/;
+        var sForm = this.state.statusForm
         if (e.target.value === '' || re.test(e.target.value)) {
-            this.setState({ nombre: [e.target.value] })
+            sForm[0] = true
+            this.setState({ nombre: [e.target.value], statusForm: sForm })
         }
     }
 
     valNumber = (e) => {
         const re = /^[0-9\b]+$/;
+        var sForm = this.state.statusForm
         if (e.target.value === '' || re.test(e.target.value)) {
-            this.setState({ numero: [e.target.value] })
+            sForm[4] = true
+            this.setState({ numero: [e.target.value], statusForm: sForm })
         }
     }
 
@@ -70,12 +116,17 @@ class Navbar extends Component {
         showMessage.classList.remove("is-danger")
         this.setState({ correo: [e.target.value] },
             () => {
+                var sForm = this.state.statusForm
                 if ((e.target.value === '' || re.test(e.target.value)) && this.state.correo[0].length !== 0) {
                     showMessage.innerHTML = "Correo valido."
                     showMessage.classList.add("is-success")
+                    sForm[2] = true
+                    this.setState({ statusForm: sForm })
                 } else {
                     showMessage.innerHTML = "Correo no valido."
                     showMessage.classList.add("is-danger")
+                    sForm[2] = false
+                    this.setState({ statusForm: sForm })
                 }
             }
         )
@@ -85,7 +136,7 @@ class Navbar extends Component {
         let pass_o = document.getElementById("passO").value
         const re8caracter = new RegExp("[a-zA-Z0-9]{8,}");
         const letraMin = new RegExp("(?=.*[a-z])");
-        const letraMay= new RegExp("(?=.*[A-Z])");
+        const letraMay = new RegExp("(?=.*[A-Z])");
         const unDig = new RegExp("(?=.*[0-9])");
         const carEspecial = new RegExp("(?=.*[!@#$%^&*:])");
 
@@ -95,45 +146,137 @@ class Navbar extends Component {
         var message = [' 8 caracteres', ' al menos una letra mayúscula',
             ' al menos una letra minúscula', ' un número', ' un símbolo (!, @, #, $, %, ^, &, *, :)']
         const auxmessage = [' 8 caracteres', ' al menos una letra mayúscula',
-        ' al menos una letra minúscula', ' un número', ' un símbolo (!, @, #, $, %, ^, &, *, :)']
-        if (re8caracter.test(pass_o)) {
-            message.splice(message.indexOf(auxmessage[0]), 1)
-        }
-        if (letraMay.test(pass_o)) {
-            message.splice(message.indexOf(auxmessage[1]), 1)
-        }
-        if (letraMin.test(pass_o)) {
-            message.splice(message.indexOf(auxmessage[2]), 1)
-        }
-        if (unDig.test(pass_o)) {
-            message.splice(message.indexOf(auxmessage[3]), 1)
-        }
-        if (carEspecial.test(pass_o)) {
-            message.splice(message.indexOf(auxmessage[4]), 1)
+            ' al menos una letra minúscula', ' un número', ' un símbolo (!, @, #, $, %, ^, &, *, :)']
+        this.setState({ contraseña: [e.target.value] }, () => {
+            if (re8caracter.test(pass_o)) {
+                message.splice(message.indexOf(auxmessage[0]), 1)
+            }
+            if (letraMay.test(pass_o)) {
+                message.splice(message.indexOf(auxmessage[1]), 1)
+            }
+            if (letraMin.test(pass_o)) {
+                message.splice(message.indexOf(auxmessage[2]), 1)
+            }
+            if (unDig.test(pass_o)) {
+                message.splice(message.indexOf(auxmessage[3]), 1)
+            }
+            if (carEspecial.test(pass_o)) {
+                message.splice(message.indexOf(auxmessage[4]), 1)
 
-        }
-        if (message.length === 0) {
-            showMessage.innerHTML = "Contraseña con formato valido"
-            showMessage.classList.add("is-success")
-        } else {
-            showMessage.innerHTML = "Debe de contener:" + message.join()
-            showMessage.classList.add("is-danger")
-        }
+            }
+            if (message.length === 0 && this.state.contraseña[0].length !== 0) {
+                showMessage.innerHTML = "Contraseña con formato valido"
+                showMessage.classList.add("is-success")
+            } else {
+                showMessage.innerHTML = "Debe de contener:" + message.join()
+                showMessage.classList.add("is-danger")
+            }
+
+        })
+
     }
+
     valPassword = (e) => {
         let pass_o = document.getElementById("passO").value
         let pass_c = document.getElementById("passC").value
         var showMessage = document.getElementById("msgPassC")
         showMessage.classList.remove("is-success")
         showMessage.classList.remove("is-danger")
+        var sForm = this.state.statusForm
         if (pass_o === pass_c) {
             showMessage.innerHTML = "Las contraseñas coinciden."
             showMessage.classList.add("is-success")
+            sForm[3] = true
+            this.setState({ statusForm: sForm })
         } else {
             showMessage.innerHTML = "Las contraseñas no coinciden."
             showMessage.classList.add("is-danger")
+            sForm[3] = false
+            this.setState({ statusForm: sForm })
         }
     }
+
+    cAName = (event) => {
+        event.stopPropagation()
+        event.preventDefault()
+        var file = event.target.files[0]
+        var showMessage = document.getElementById("msgImage")
+        showMessage.classList.remove("is-success")
+        showMessage.classList.remove("is-danger")
+        var sForm = this.state.statusForm
+        if (file.size / 1024 > 1024) {
+            showMessage.innerHTML = "El archivo debe ser menor a 1 MB."
+            showMessage.classList.add("is-danger")
+            sForm[5] = false
+            this.setState({ statusForm: sForm })
+        } else {
+            const reader = new FileReader();
+            reader.onload = () => {
+                this.setState({ image: reader.result });
+            };
+            reader.readAsDataURL(file);
+            sForm[5] = true
+            this.setState({
+                dataImagen: file, statusForm: sForm
+            },
+                this.showModal_image
+            )
+
+            showMessage.innerHTML = "Foto guardada."
+            showMessage.classList.add("is-success")
+        }
+    }
+
+    hacerRegistro = () => {
+        if (this.state.statusForm[5]) {
+            var texto = this.state.dataImagen.name
+
+            //Que pereza escribir esto pero bueno xd
+            var arrForm = this.state.statusForm
+            var boolArray = arrForm[0]
+            for (var i = 1; i < arrForm.length; i++)
+                boolArray = boolArray && arrForm[i]
+
+            if (boolArray) {
+                if (this.state.nombre[0].length !== 0 && this.state.apellido[0].length !== 0 && this.state.numero[0].length !== 0 && this.state.correo[0].length !== 0 && this.state.contraseña[0].length !== 0) {
+                    var formData = new FormData();
+                    formData.append('nombreUsuario', this.state.nombre[0]);
+                    formData.append('apellidoUsuario', this.state.apellido[0]);
+                    formData.append('numeroTel', this.state.numero[0]);
+                    formData.append('emailUsuario', this.state.correo[0]);
+                    formData.append('passUsuario', this.state.contraseña[0]);
+                    this.state.cropper.getCroppedCanvas().toBlob(function (blob) {
+                        formData.append('imgUsuario', blob);
+                        for (var value of formData.values()) {
+                            console.log(value);
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Faltan campos que llenar',
+                        text: 'Porfavor de terminar el formulario',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    })
+                }
+            } else {
+                Swal.fire({
+                    title: 'Faltan campos que llenar',
+                    text: 'Porfavor de terminar el formulario',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                })
+            }
+        } else {
+            Swal.fire({
+                title: 'Faltan campos que llenar',
+                text: 'Porfavor de terminar el formulario',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            })
+        }
+    }
+
     render() {
         return (
             <div>
@@ -219,7 +362,7 @@ class Navbar extends Component {
                                 </div>
                                 <div class="field">
                                     <p class="control has-icons-left">
-                                        <input id="passO" class="input" type="password" placeholder="Tu contraseña" onChange={this.valPasswordI} />
+                                        <input id="passO" class="input" type="password" value={this.state.contraseña} placeholder="Tu contraseña" onChange={this.valPasswordI} />
                                         <span class="icon is-medium is-left">
                                             <i class="fa fa-lock"></i>
                                         </span>
@@ -236,15 +379,42 @@ class Navbar extends Component {
                                     <p id="msgPassC" class="help"></p>
                                 </div>
                                 <div class="field">
-                                    <p class="control has-icons-left">
-                                        <input class="input" type="text" maxLength="10" placeholder="Número teléfonico" value={this.state.numero} onChange={this.valNumber} />
-                                        <span class="icon is-medium is-left">
-                                            <i class="fa fa-phone"></i>
-                                        </span>
-                                    </p>
+                                    <div class="field is-expanded">
+                                        <div class="field has-addons">
+                                            <p class="control">
+                                                <a class="button is-static">
+                                                    +52
+                                                </a>
+                                            </p>
+                                            <p class="control has-icons-left is-expanded">
+                                                <input class="input" type="text" maxLength="10" placeholder="Número teléfonico" value={this.state.numero} onChange={this.valNumber} />
+                                                <span class="icon is-medium is-left">
+                                                    <i class="fa fa-phone"></i>
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
+                                <div class="file has-name">
+                                    <label class="file-label">
+                                        <input class="file-input" accept="image/*" id="file-upload" type="file" name="resume" onChange={this.cAName.bind(this)} />
+                                        <span class="file-cta">
+                                            <span class="file-icon">
+                                                <i class="fa fa-upload"></i>
+                                            </span>
+                                            <span class="file-label">
+                                                Imagen de perfil (opcional)
+                                            </span>
+                                        </span>
+                                        <span for="file-upload" id="file-upload-filename" class="file-name">
+                                            {this.state.dataImagen.name}
+                                        </span>
+                                        <br />
+                                    </label>
+                                </div>
+                                <p id="msgImage" class="help"></p>
                                 <div class="buttons is-centered">
-                                    <button class="button is-success">Crear tu cuenta</button>
+                                    <button class="button is-success" onClick={this.hacerRegistro}>Crear tu cuenta</button>
                                 </div>
                             </div>
                         </section>
@@ -252,6 +422,42 @@ class Navbar extends Component {
                             <p>¿Ya tienes una cuenta?</p><br />
                             <button class="button is-info">Inicia sesión</button>
                         </div>
+                    </div>
+                </div>
+
+                <div id="modal_image" class="modal">
+                    <div class="modal-background"></div>
+                    <div class="modal-card">
+                        <header class="modal-card-head">
+                            <p class="modal-card-title has-text-centered">Recortar imagen</p>
+                        </header>
+
+                        <section class="modal-card-body ">
+                            <div class="content is-centered">
+                                <Cropper
+                                    style={{ width: "100%" }}
+                                    initialAspectRatio={1}
+                                    preview=".img-preview"
+                                    src={this.state.image}
+                                    viewMode={1}
+                                    guides={true}
+                                    minCropBoxHeight={10}
+                                    minCropBoxWidth={10}
+                                    background={false}
+                                    responsive={true}
+                                    autoCropArea={1}
+                                    checkOrientation={false} // https://github.com/fengyuanchen/cropperjs/issues/671
+                                    onInitialized={(instance) => {
+                                        this.setState({ cropper: instance });
+                                    }}
+                                />
+                                <div>
+                                    <button class=" button is-link" style={{ float: "right" }} onClick={this.getCropData}>
+                                        Salvar y cerrar
+                                                </button>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
             </div >
