@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import Logo from 'resources/images/Logo.jpg'
 import Swal from 'sweetalert2'
 import Cropper from "react-cropper";
@@ -39,13 +39,7 @@ class Navbar extends Component {
     }
 
     componentDidMount() {
-        const query = new URLSearchParams(window.location.search);
-        const token = query.get('confirmAcct')
-        console.log(token)//Pensemeos que hacemos un llamado a la API y confirmamos confirmamos
-        //Por el momento si token = 1 entonces => Confirmado otherwise no confirmado
-        if (token === 1) {
-            document.getElementById("opLeft").style.visibility = "hidden";//
-        }
+
     }
 
     getCropData = () => {
@@ -260,7 +254,11 @@ class Navbar extends Component {
                                     text: 'Porfavor de revisar su correo para poder confirmar su cuenta',
                                     icon: 'success',
                                     confirmButtonText: 'Aceptar'
-                                })
+                                }).then(function (isConfirm) {
+                                    if (isConfirm) {
+                                        window.location.reload();
+                                    }
+                                });
                         })
                         .catch(function (response) {
                             if (response["response"].status === 460)
@@ -281,9 +279,6 @@ class Navbar extends Component {
                 } else {
                     this.state.cropper.getCroppedCanvas().toBlob(function (blob) {
                         formData.append('imgUsuario', blob);
-                        for (var value of formData.values()) {
-                            console.log(value);
-                        }
                         axios({
                             method: "post",
                             url: "http://127.0.0.1:5000/user/register",
@@ -297,7 +292,11 @@ class Navbar extends Component {
                                         text: 'Porfavor de revisar su correo para poder confirmar su cuenta',
                                         icon: 'success',
                                         confirmButtonText: 'Aceptar'
-                                    })
+                                    }).then(function (isConfirm) {
+                                        if (isConfirm) {
+                                            window.location.reload();
+                                        }
+                                    });
                             })
                             .catch(function (response) {
                                 if (response["response"].status === 460)

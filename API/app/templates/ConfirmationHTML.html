@@ -142,7 +142,7 @@
                                                             style="font-size:0px;padding:10px 25px;padding-top:30px;word-break:break-word;">
                                                             <div
                                                                 style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:16px;font-weight:bold;letter-spacing:1px;line-height:24px;text-align:center;text-transform:uppercase;color:#ffffff;">
-                                                                Confirmacion de correo <br>
+                                                                Confirmación de correo <br>
                                                                 <span
                                                                     style="color: #979797; font-weight: normal">-</span>
                                                             </div>
@@ -153,7 +153,10 @@
                                                             style="font-size:0px;padding:10px 25px;padding-top:0;word-break:break-word;">
                                                             <div
                                                                 style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:left;color:#ffffff;">
-                                                                Para poder confirmar su correo haga click en el siguiente boton.</div>
+                                                                {% for item in data %}
+                                                                    Hola {{item.nombreUser}}, para poder confirmar su correo haga click en el siguiente boton.
+                                                                {% endfor%}
+                                                                </div>
                                                            
                                                         </td>
                                                     </tr>
@@ -163,11 +166,12 @@
                                                             <div
                                                                 style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:13px;font-weight:bold;letter-spacing:1px;line-height:20px;text-align:center;text-transform:uppercase;color:#17CBC4;">
                                                                 {% for item in data %}
-                                                                <a href="https://www.google.com/search?q={{item.name}}"
+                                                                <a href="http://localhost:3000/confirmacion?confirmation={{
+                                                                    item.correoUserHex
+                                                                }}"
                                                                     style="display:inline-block;width:250px;background:#5e6ebf;color:#ffffff;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:17px;font-weight:bold;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:3px;"
                                                                     target="_blank"> - Confirmar correo -
                                                                 </a>
-
                                                                 {% endfor%}
                                                             </div>
                                                         </td>
