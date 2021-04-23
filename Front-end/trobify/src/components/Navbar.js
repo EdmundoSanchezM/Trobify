@@ -4,6 +4,7 @@ import Logo from 'resources/images/Logo.jpg'
 import Swal from 'sweetalert2'
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
+import axios from 'axios';
 
 class Navbar extends Component {
     constructor(props) {
@@ -42,7 +43,7 @@ class Navbar extends Component {
         const token = query.get('confirmAcct')
         console.log(token)//Pensemeos que hacemos un llamado a la API y confirmamos confirmamos
         //Por el momento si token = 1 entonces => Confirmado otherwise no confirmado
-        if (token == 1) {
+        if (token === 1) {
             document.getElementById("opLeft").style.visibility = "hidden";//
         }
     }
@@ -204,60 +205,117 @@ class Navbar extends Component {
         showMessage.classList.remove("is-success")
         showMessage.classList.remove("is-danger")
         var sForm = this.state.statusForm
-        if (file.size / 1024 > 1024) {
-            showMessage.innerHTML = "El archivo debe ser menor a 1 MB."
-            showMessage.classList.add("is-danger")
-            sForm[5] = false
-            this.setState({ statusForm: sForm })
-        } else {
-            const reader = new FileReader();
-            reader.onload = () => {
-                this.setState({ image: reader.result });
-            };
-            reader.readAsDataURL(file);
-            sForm[5] = true
-            this.setState({
-                dataImagen: file, statusForm: sForm
-            },
-                this.showModal_image
-            )
+        if (file != undefined) {
+            if (file.size / 1024 > 1024) {
+                showMessage.innerHTML = "El archivo debe ser menor a 1 MB."
+                showMessage.classList.add("is-danger")
+                sForm[5] = false
+                this.setState({ statusForm: sForm })
+            } else {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    this.setState({ image: reader.result });
+                };
+                reader.readAsDataURL(file);
+                sForm[5] = true
+                this.setState({
+                    dataImagen: file, statusForm: sForm
+                },
+                    this.showModal_image
+                )
 
-            showMessage.innerHTML = "Foto guardada."
-            showMessage.classList.add("is-success")
+                showMessage.innerHTML = "Foto guardada."
+                showMessage.classList.add("is-success")
+            }
+        } else {
+
         }
     }
 
     hacerRegistro = () => {
-        if (this.state.statusForm[5]) {
-            var texto = this.state.dataImagen.name
-
-            //Que pereza escribir esto pero bueno xd
-            var arrForm = this.state.statusForm
-            var boolArray = arrForm[0]
-            for (var i = 1; i < arrForm.length; i++)
-                boolArray = boolArray && arrForm[i]
-
-            if (boolArray) {
-                if (this.state.nombre[0].length !== 0 && this.state.apellido[0].length !== 0 && this.state.numero[0].length !== 0 && this.state.correo[0].length !== 0 && this.state.contraseña[0].length !== 0) {
-                    var formData = new FormData();
-                    formData.append('nombreUsuario', this.state.nombre[0]);
-                    formData.append('apellidoUsuario', this.state.apellido[0]);
-                    formData.append('numeroTel', this.state.numero[0]);
-                    formData.append('emailUsuario', this.state.correo[0]);
-                    formData.append('passUsuario', this.state.contraseña[0]);
+        var arrForm = this.state.statusForm
+        var boolArray = arrForm[0]
+        for (var i = 1; i < arrForm.length - 1; i++)
+            boolArray = boolArray && arrForm[i]
+        if (boolArray) {
+            if (this.state.nombre[0].length !== 0 && this.state.apellido[0].length !== 0 && this.state.numero[0].length !== 0 && this.state.correo[0].length !== 0 && this.state.contraseña[0].length !== 0) {
+                var formData = new FormData();
+                formData.append('nombreUsuario', this.state.nombre[0]);
+                formData.append('apellidoUsuario', this.state.apellido[0]);
+                formData.append('numeroTel', this.state.numero[0]);
+                formData.append('emailUsuario', this.state.correo[0]);
+                formData.append('passUsuario', this.state.contraseña[0]);
+                var formWImage = arrForm[5]
+                if (!formWImage) {
+                    axios({
+                        method: "post",
+                        url: "http://127.0.0.1:5000/user/register",
+                        data: formData,
+                        headers: { "Content-Type": "multipart/form-data" },
+                    })
+                        .then(function (response) {
+                            if (response.status === 200)
+                                Swal.fire({
+                                    title: 'Registro realizado con exito',
+                                    text: 'Porfavor de revisar su correo para poder confirmar su cuenta',
+                                    icon: 'success',
+                                    confirmButtonText: 'Aceptar'
+                                })
+                        })
+                        .catch(function (response) {
+                            if (response["response"].status === 460)
+                                Swal.fire({
+                                    title: 'El registro no se pudo completar',
+                                    text: 'El correo que se intento usar ya esta en uso, use un correo diferente',
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar'
+                                })
+                            else
+                                Swal.fire({
+                                    title: 'El registro no se pudo completar',
+                                    text: 'Ocurrrio un error en el servidor',
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar'
+                                })
+                        });
+                } else {
                     this.state.cropper.getCroppedCanvas().toBlob(function (blob) {
                         formData.append('imgUsuario', blob);
                         for (var value of formData.values()) {
                             console.log(value);
                         }
+                        axios({
+                            method: "post",
+                            url: "http://127.0.0.1:5000/user/register",
+                            data: formData,
+                            headers: { "Content-Type": "multipart/form-data" },
+                        })
+                            .then(function (response) {
+                                if (response.status === 200)
+                                    Swal.fire({
+                                        title: 'Registro realizado con exito',
+                                        text: 'Porfavor de revisar su correo para poder confirmar su cuenta',
+                                        icon: 'success',
+                                        confirmButtonText: 'Aceptar'
+                                    })
+                            })
+                            .catch(function (response) {
+                                if (response["response"].status === 460)
+                                    Swal.fire({
+                                        title: 'El registro no se pudo completar',
+                                        text: 'El correo que se intento usar ya esta en uso, use un correo diferente',
+                                        icon: 'error',
+                                        confirmButtonText: 'Aceptar'
+                                    })
+                                else
+                                    Swal.fire({
+                                        title: 'El registro no se pudo completar',
+                                        text: 'Ocurrrio un error en el servidor',
+                                        icon: 'error',
+                                        confirmButtonText: 'Aceptar'
+                                    })
+                            });
                     });
-                } else {
-                    Swal.fire({
-                        title: 'Faltan campos que llenar',
-                        text: 'Porfavor de terminar el formulario',
-                        icon: 'error',
-                        confirmButtonText: 'Aceptar'
-                    })
                 }
             } else {
                 Swal.fire({

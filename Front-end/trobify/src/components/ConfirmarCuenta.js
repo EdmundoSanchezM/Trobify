@@ -20,7 +20,7 @@ class ConfirmarCuenta extends Component {
     }
     componentDidMount() {
         const valStyle = document.getElementById("opLeft").style.visibility;
-        if (valStyle == "hidden") {
+        if (valStyle === "hidden") {
             document.getElementById("ncorreoC").style.display = "none"
             document.getElementById("correoC").style.display = "block"
         } else {
