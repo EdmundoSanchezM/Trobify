@@ -19,6 +19,7 @@ class ConfirmarCuenta extends Component {
             numero: '',
             correo: ''
         };
+        this.showModal_Ingreso = this.showModal_Ingreso.bind(this);
     }
     componentDidMount() {
         const urlWindow = window.location
@@ -83,6 +84,12 @@ class ConfirmarCuenta extends Component {
 
     }
 
+    showModal_Ingreso() {
+        var target = document.getElementById('modal_inicio_sesion');
+        document.documentElement.classList.add("is-clipped");
+        target.classList.add("is-active");
+    }
+
     render() {
         return (
             <div>
@@ -96,9 +103,7 @@ class ConfirmarCuenta extends Component {
                             <Image src={Casita} />
                         </Columns.Column>
                         <Columns.Column size="half" offset="one-quarter">
-                            <Button renderAs="button" color="success">
-                                Iniciar sesión
-                            </Button>
+                            <button class="button is-success" onClick={this.showModal_Ingreso}>Iniciar sesión</button>
                         </Columns.Column>
                         <Columns.Column size="half" offset="one-quarter">
                             <Link to="/">

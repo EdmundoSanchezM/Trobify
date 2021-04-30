@@ -5,6 +5,7 @@ import Swal from 'sweetalert2'
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import axios from 'axios';
+import userData from 'UserProfile'
 
 class Navbar extends Component {
     constructor(props) {
@@ -20,10 +21,12 @@ class Navbar extends Component {
             image: '',
             cropData: "#",
             cropper: '',
+            correoIngreso: '',
             statusForm: [false, false, false, false, false, false] //Que estoy haciendo con mi vida unu?
             //Como sea, valores para validar, orden: Nombre,apellido, email, pass, cel, img
         };
         this.showModal = this.showModal.bind(this);
+        this.showModalIngreso = this.showModalIngreso.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.showModal_image = this.showModal_image.bind(this);
         this.closeModal_image = this.closeModal_image.bind(this);
@@ -36,10 +39,35 @@ class Navbar extends Component {
         this.cAName = this.cAName.bind(this);
         this.getCropData = this.getCropData.bind(this);
         this.hacerRegistro = this.hacerRegistro.bind(this);
+        this.valMailI = this.valMailI.bind(this);
+        this.closeModal_IniciarSesion = this.closeModal_IniciarSesion.bind(this);
+        this.iniciarSesion = this.iniciarSesion.bind(this);
+        this.logout = this.logout.bind(this);
     }
 
     componentDidMount() {
+        const nombreU = userData.getName()
+        if (nombreU !== null && nombreU !== '') {
+            document.getElementById("prueba").style.visibility = "visible"
+            document.getElementById("iniciarSesion").style.visibility = "hidden"
+            document.getElementById("opLeft").style.visibility = "hidden"
+        } else {
+            document.getElementById("prueba").style.visibility = "hidden"
+        }
 
+    }
+
+    logout = () => {
+        Swal.fire({
+            title: 'Sesión cerrada',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        }).then(function (isConfirm) {
+            if (isConfirm) {
+                localStorage.clear();
+                window.location.href = '/';
+            }
+        });
     }
 
     getCropData = () => {
@@ -57,6 +85,18 @@ class Navbar extends Component {
         var target = document.getElementById('modal');
         document.documentElement.classList.add("is-clipped");
         target.classList.add("is-active");
+    }
+
+    showModalIngreso = () => {
+        var target = document.getElementById('modal_inicio_sesion');
+        document.documentElement.classList.add("is-clipped");
+        target.classList.add("is-active");
+    }
+
+    closeModal_IniciarSesion = () => {
+        var target = document.getElementById('modal_inicio_sesion');
+        target.classList.remove("is-active");
+        document.documentElement.classList.remove("is-clipped");
     }
 
     closeModal = () => {
@@ -226,6 +266,29 @@ class Navbar extends Component {
         }
     }
 
+    valMailI = (e) => {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        var showMessage = document.getElementById("msgMailIngreso")
+        showMessage.classList.remove("is-success")
+        showMessage.classList.remove("is-danger")
+        this.setState({ correoIngreso: [e.target.value] },
+            () => {
+                var sForm = this.state.statusForm
+                if ((e.target.value === '' || re.test(e.target.value)) && this.state.correoIngreso[0].length !== 0) {
+                    showMessage.innerHTML = "Correo valido."
+                    showMessage.classList.add("is-success")
+                    sForm[2] = true
+                    this.setState({ statusForm: sForm })
+                } else {
+                    showMessage.innerHTML = "Correo no valido."
+                    showMessage.classList.add("is-danger")
+                    sForm[2] = false
+                    this.setState({ statusForm: sForm })
+                }
+            }
+        )
+    }
+
     hacerRegistro = () => {
         var arrForm = this.state.statusForm
         var boolArray = arrForm[0]
@@ -248,7 +311,7 @@ class Navbar extends Component {
                         headers: { "Content-Type": "multipart/form-data" },
                     })
                         .then(function (response) {
-                            if (response.status === 200)
+                            if (response.status === 201)
                                 Swal.fire({
                                     title: 'Registro realizado con exito',
                                     text: 'Porfavor de revisar su correo para poder confirmar su cuenta',
@@ -286,7 +349,7 @@ class Navbar extends Component {
                             headers: { "Content-Type": "multipart/form-data" },
                         })
                             .then(function (response) {
-                                if (response.status === 200)
+                                if (response.status === 201)
                                     Swal.fire({
                                         title: 'Registro realizado con exito',
                                         text: 'Porfavor de revisar su correo para poder confirmar su cuenta',
@@ -334,6 +397,62 @@ class Navbar extends Component {
         }
     }
 
+    iniciarSesion = () => {
+        const contraseña = document.getElementById("contraseñaIngreso").value
+        if (this.state.correoIngreso[0].length !== 0 && contraseña.length !== 0) {
+            var formData = new FormData();
+            formData.append('correoUsuario', this.state.correoIngreso[0]);
+            formData.append('contraseñaUsuario', contraseña);
+            axios({
+                method: "post",
+                url: "http://127.0.0.1:5000/user/login",
+                data: formData,
+                headers: { "Content-Type": "multipart/form-data" },
+            })
+                .then(function (response) {
+                    if (response.status === 200) {
+                        Swal.fire({
+                            title: 'Inicio de sesión',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        }).then(function (isConfirm) {
+                            if (isConfirm) {
+                                window.location.reload();
+                            }
+                        });
+                        userData.setName(response.data.nombre);
+                        userData.setlast_name(response.data.apellido);
+                        userData.setType(response.data.tipo)
+                        userData.setImage(response.data.imagen)
+                    }
+
+                })
+                .catch(function (response) {
+                    if (response.status === 449) {
+                        Swal.fire({
+                            title: 'Ocurrio un error',
+                            text: 'Contraseña o correo incorrecto',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        })
+                    } else
+                        Swal.fire({
+                            title: 'El inicio de sesión fallo',
+                            text: 'Ocurrrio un error en el servidor',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        })
+                });
+        } else {
+            Swal.fire({
+                title: 'Faltan campos que llenar',
+                text: 'Porfavor de terminar el formulario',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            })
+        }
+    }
+
     render() {
         return (
             <div>
@@ -371,14 +490,32 @@ class Navbar extends Component {
                                 </p>
                             </div>
                         </div>
-                        <div id="opLeft" class="navbar-end">
-                            <Link to="/" class="navbar-item is-active">
-                                Inicio
-                            </Link>
-                            <a class="navbar-item" data-target="#modal" onClick={this.showModal}>
+                        <div class="navbar-end">
+                            <a class="navbar-item" id="opLeft" ata-target="#modal" onClick={this.showModal}>
                                 Registrarse
                             </a>
+                            <a class="navbar-item" id="iniciarSesion" data-target="#modal" onClick={this.showModalIngreso}>
+                                Iniciar sesión
+                            </a>
+                            <div id="prueba" className="navbar-item has-dropdown is-hoverable">
+                                <a class="navbar-item" style={{
+                                    background: `url(data:image/png;base64,${userData.getImage()}) no-repeat center center`,
+                                    backgroundSize: "cover",
+                                    width: 74, height: 55
+                                }}>
+                                </a>
+                                <a className="navbar-link">
+                                    Hola {userData.getName()} !
+                                </a>
+                                <div className="navbar-dropdown">
+                                    <a className="navbar-item">Publicar propiedad</a>
+                                    <a className="navbar-item">Jobs</a>
+                                    <a className="navbar-item">Contact</a>
+                                    <a className="navbar-item" onClick={this.logout}>Cerrar sesión</a>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                 </nav>
 
@@ -503,7 +640,7 @@ class Navbar extends Component {
                                     background={false}
                                     responsive={true}
                                     autoCropArea={1}
-                                    checkOrientation={false} // https://github.com/fengyuanchen/cropperjs/issues/671
+                                    checkOrientation={false}
                                     onInitialized={(instance) => {
                                         this.setState({ cropper: instance });
                                     }}
@@ -517,6 +654,44 @@ class Navbar extends Component {
                         </section>
                     </div>
                 </div>
+
+                <div id="modal_inicio_sesion" class="modal">
+                    <div class="modal-background"></div>
+                    <div class="modal-card">
+                        <header class="modal-card-head">
+                            <p class="modal-card-title has-text-centered">Accede a tu cuenta</p>
+                            <button class="delete" aria-label="close" onClick={this.closeModal_IniciarSesion}></button>
+                        </header>
+
+                        <section class="modal-card-body ">
+                            <div class="content is-centered">
+                                <div class="field">
+                                    <p class="control has-icons-left has-icons-right">
+                                        <input class="input" type="email" value={this.state.correoIngreso} placeholder="Tu correo electrónico" onChange={this.valMailI} />
+                                        <span class="icon is-small is-left">
+                                            <i class="fa fa-envelope"></i>
+                                        </span>
+                                    </p>
+                                    <p id="msgMailIngreso" class="help"></p>
+                                </div>
+                                <div class="field">
+                                    <p class="control has-icons-left">
+                                        <input id="contraseñaIngreso" class="input" type="password" placeholder="Tu contraseña" />
+                                        <span class="icon is-medium is-left">
+                                            <i class="fa fa-lock"></i>
+                                        </span>
+                                    </p>
+                                    <p id="msgPassO" class="help"></p>
+                                </div>
+                                <div id="holaatodos"></div>
+                                <div class="buttons is-centered">
+                                    <button class="button is-success" onClick={this.iniciarSesion}>Iniciar sesión</button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
             </div >
         )
     }

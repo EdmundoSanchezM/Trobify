@@ -3,6 +3,7 @@ import json
 import sqlite3
 from flask_cors import CORS, cross_origin
 from flask_mail import Mail, Message
+from base64 import b64encode
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -17,7 +18,6 @@ app.config['MAIL_PASSWORD'] = 'edmundocsgo'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
-
 
 def db_conexion():
     conn = None
@@ -50,7 +50,7 @@ def registrarUsuario():
             cursor.execute(
                 'insert into USUARIOS values(?,?,?,?,?,?,?)', (*data,))
             conn.commit()
-            res = make_response(jsonify({"message": "OK"}), 200)
+            res = make_response(jsonify({"message": "OK"}), 201)
             sendConfimacionEmail(nombreUser, emailUser)
             return res
         except (sqlite3.Error, sqlite3.Warning) as e:
@@ -64,53 +64,81 @@ def registrarUsuario():
             cursor.execute(
                 'insert into USUARIOS values(?,?,?,?,?,?,?)', (*data,))
             conn.commit()
-            res = make_response(jsonify({"message": "OK"}), 200)
+            res = make_response(jsonify({"message": "OK"}), 201)
             sendConfimacionEmail(nombreUser, emailUser)
             return res
         except (sqlite3.Error, sqlite3.Warning) as e:
-            # Llave primaria en uso uwu
             res = make_response(jsonify({"message": "No oK"}), 460)
             return res
     res = make_response(jsonify({"message": "No ok"}), 400)
     return res
 
-
 @app.route("/user/confirmationMail", methods=['POST'])
 def confirmarUsuario():
     conn = db_conexion()
     cursor = conn.cursor()
-    correoConfirmar = bytes.fromhex(
-        request.form['mailConfirm']).decode(encoding='utf_8')
-    data = (1, correoConfirmar)
-    cursor.execute(
-        'SELECT count(*) FROM USUARIOS where Correo = ?', (correoConfirmar,))
-    existeMail = cursor.fetchall()
-    if (len(existeMail) == 0):
-        res = make_response(jsonify({"message": "No ok"}), 460)
-        return res
-    else:
+    try:
+        correoConfirmar = bytes.fromhex(
+            request.form['mailConfirm']).decode(encoding='utf_8') 
+        data = (1, correoConfirmar)
         cursor.execute(
-            'SELECT * FROM USUARIOS where Correo = ?', (correoConfirmar,))
-        correoConfirmado = cursor.fetchall()
-        valorTipo = 0
-        for row in correoConfirmado:
-            valorTipo = row[5]
-        if (valorTipo != 0):
-            res = make_response(jsonify({"message": "No ok"}), 461)
+            'SELECT count(*) FROM USUARIOS where Correo = ?', (correoConfirmar,))
+        existeMail = cursor.fetchall()
+        if (len(existeMail) == 0):
+            res = make_response(jsonify({"message": "No ok"}), 460)
             return res
         else:
-            try:
-                cursor.execute(
-                    'update USUARIOS SET Tipo = ? where Correo = ?', data)
-                conn.commit()
-                cursor.close()
-                res = make_response(jsonify({"message": "OK"}), 200)
+            cursor.execute(
+                'SELECT * FROM USUARIOS where Correo = ?', (correoConfirmar,))
+            correoConfirmado = cursor.fetchall()
+            valorTipo = 0
+            for row in correoConfirmado:
+                valorTipo = row[5]
+            if (valorTipo != 0):
+                res = make_response(jsonify({"message": "No ok"}), 461)
                 return res
-            except (sqlite3.Error, sqlite3.Warning) as e:
-                # Llave primaria en uso uwu
-                res = make_response(jsonify({"message": "No ok"}), 400)
-                return res
+            else:
+                try:
+                    cursor.execute(
+                        'update USUARIOS SET Tipo = ? where Correo = ?', data)
+                    conn.commit()
+                    cursor.close()
+                    res = make_response(jsonify({"message": "OK"}), 200)
+                    return res
+                except (sqlite3.Error, sqlite3.Warning) as e:
+                    # Llave primaria en uso uwu
+                    res = make_response(jsonify({"message": "No ok"}), 400)
+                    return res
+    except:
+        res = make_response(jsonify({"message": "No ok"}), 400)
+        return res
 
+@app.route("/user/login", methods=['POST'])
+def iniciarSesionUsuario():
+    conn = db_conexion()
+    cursor = conn.cursor()
+    email = request.form['correoUsuario']
+    password = request.form['contraseñaUsuario']
+    data = [email, password]
+    try:
+        cursor.execute(
+            'SELECT * FROM USUARIOS where Correo = ? and Contraseña=?', (*data,))
+        conn.commit()
+        userConfirmado = cursor.fetchall()
+        userData = dict()
+        for row in userConfirmado:
+            userData['nombre'] = row[0]
+            userData['apellido'] = row[1]
+            userData['tipo'] = row[5]
+            userData['imagen'] = b64encode(row[6]).decode('utf-8')
+        if(len(userData)!=0):
+            return jsonify(userData),200 
+        else:
+            res = make_response(jsonify({"message": "No oK"}), 449)
+            return res
+    except (sqlite3.Error, sqlite3.Warning) as e:
+        res = make_response(jsonify({"message": "No oK"}), 460)
+        return res
 
 def sendConfimacionEmail(nombreUser, emailUser):
     msg = Message(subject="Confirmacion de correo",

@@ -6,16 +6,16 @@ import Image from 'react-bulma-components/lib/components/image';
 import { Link } from 'react-router-dom';
 import Navbar from 'components/Navbar';
 import Casita from 'resources/images/Casitacuqui.png';
-
+import background from 'resources/images/borrable.jpg';
 const Home = () => {
     return (
         <div>
             <Navbar />
-            <Section>
+            <Section style={{backgroundImage: `url(${background})`}}>
                 <div className="container has-text-centered">
                     <Heading>
                         Trobify
-                </Heading>
+                    </Heading>
                     <Columns>
                         <Columns.Column>
                             <Image src={Casita} />
@@ -31,6 +31,33 @@ const Home = () => {
                         </Columns.Column>
                     </Columns>
                     <Columns>
+                        <Columns.Column>
+                            <Image src={Casita} />
+                        </Columns.Column>
+                        <Columns.Column>
+                            <Image src={Casita} />
+                        </Columns.Column>
+                        <Columns.Column>
+                            <Image src={Casita} />
+                        </Columns.Column>
+                        <Columns.Column>
+                            <Image src={Casita} />
+                        </Columns.Column>
+                    </Columns>
+                    <Columns>
+                        <Columns.Column>
+                            <Image src={Casita} />
+                        </Columns.Column>
+                        <Columns.Column>
+                            <Image src={Casita} />
+                        </Columns.Column>
+                        <Columns.Column>
+                            <Image src={Casita} />
+                        </Columns.Column>
+                        <Columns.Column>
+                            <Image src={Casita} />
+                        </Columns.Column>
+                    </Columns><Columns>
                         <Columns.Column>
                             <Image src={Casita} />
                         </Columns.Column>
