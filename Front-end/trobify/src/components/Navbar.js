@@ -6,7 +6,8 @@ import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import axios from 'axios';
 import userData from 'UserProfile'
-
+/*Librerias del memo :v*/ 
+import { useHistory } from "react-router-dom";
 class Navbar extends Component {
     constructor(props) {
         super(props);
@@ -510,7 +511,7 @@ class Navbar extends Component {
                                 <div className="navbar-dropdown">
                                     <a className="navbar-item">Publicar propiedad</a>
                                     <a className="navbar-item">Jobs</a>
-                                    <a className="navbar-item">Contact</a>
+                                    <a className="navbar-item" >Crear Citas up</a>
                                     <a className="navbar-item" onClick={this.logout}>Cerrar sesión</a>
                                 </div>
                             </div>
