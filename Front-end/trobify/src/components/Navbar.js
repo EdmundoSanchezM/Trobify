@@ -44,6 +44,12 @@ class Navbar extends Component {
         this.closeModal_IniciarSesion = this.closeModal_IniciarSesion.bind(this);
         this.iniciarSesion = this.iniciarSesion.bind(this);
         this.logout = this.logout.bind(this);
+        this.cita = this.cita.bind(this);
+    }
+
+    cita  = () => {
+        window.location.href = '/';
+        //No se como mandar a otra pagina unu, auida
     }
 
     componentDidMount() {
@@ -511,7 +517,7 @@ class Navbar extends Component {
                                 <div className="navbar-dropdown">
                                     <a className="navbar-item">Publicar propiedad</a>
                                     <a className="navbar-item">Jobs</a>
-                                    <a className="navbar-item" >Crear Citas up</a>
+                                    <a className="navbar-item" onClick={this.cita}>Crear Citas up</a>
                                     <a className="navbar-item" onClick={this.logout}>Cerrar sesión</a>
                                 </div>
                             </div>
