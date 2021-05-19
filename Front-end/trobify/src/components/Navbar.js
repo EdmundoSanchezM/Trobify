@@ -461,7 +461,7 @@ class Navbar extends Component {
                         <a class="navbar-item" style={{
                             background: `url(${Logo}) no-repeat center center`,
                             backgroundSize: "cover",
-                            width: 110, height: 55
+                            width: 110, height: 56
                         }} href="/">
                         </a>
                         <a
