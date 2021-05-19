@@ -508,7 +508,7 @@ class Navbar extends Component {
                                     Hola {userData.getName()} !
                                 </a>
                                 <div className="navbar-dropdown">
-                                    <a className="navbar-item">Publicar propiedad</a>
+                                    <a className="navbar-item" href="/property_insert">Publicar propiedad</a>
                                     <a className="navbar-item">Jobs</a>
                                     <a className="navbar-item">Contact</a>
                                     <a className="navbar-item" onClick={this.logout}>Cerrar sesión</a>
