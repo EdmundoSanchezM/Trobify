@@ -110,6 +110,14 @@ class PublicarPropiedad extends Component {
     handleFiles = (e) => {
         console.clear()
         var urlsImg = this.state.arrayImg
+        if(urlsImg.length>2){
+            Swal.fire({
+                title: 'Maximo de imagenes alcanzado',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+            return true
+        }
         urlsImg.push(URL.createObjectURL(e.target.files[0]))
         var imagesArr = []
         var imagecount = 0
@@ -129,8 +137,17 @@ class PublicarPropiedad extends Component {
     }
 
     addInput = (typeInput) => {
+        
         const target = document.getElementById(typeInput);
         var id = typeInput === 'service' ? this.state.countInputService : this.state.countInputDataProperty
+        if(id>2){
+            Swal.fire({
+                title: 'Maximo de entradas alcanzado',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+            return true
+        }
         var field = document.createElement("div");
         field.className = "field";
         var control = document.createElement("div");
@@ -199,7 +216,8 @@ class PublicarPropiedad extends Component {
                                         <input class="input" type="text" placeholder="Entrecalles de la propiedad" />
                                     </div>
                                 </div>
-                                <h6 class="subtitle is-5"> </h6>
+                            </div>
+                            <div>
                                 <div class="field">
                                     <label class="label">Referencias adicionales</label>
                                     <div class="control">
@@ -208,11 +226,11 @@ class PublicarPropiedad extends Component {
                                 </div>
                             </div>
                             <div>
-                            <div class="box has-text-centered">
-                                <button class="button is-primary" onClick={this.addInput.bind(this, 'service')}>Anunciar propiedad</button>
+                                <div class="box has-text-centered">
+                                    <button class="button is-primary" onClick={this.addInput.bind(this, 'service')}>Anunciar propiedad</button>
+                                </div>
                             </div>
-                            </div>
-                            
+
                         </Columns.Column>
                         <Columns.Column>
                             <div className="container has-text-centered">
