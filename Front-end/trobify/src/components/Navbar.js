@@ -465,8 +465,11 @@ class Navbar extends Component {
             <div>
                 <nav className="navbar is-info" role="navigation" aria-label="main navigation">
                     <div className="navbar-brand">
-                        <a class="navbar-item" href="/">
-                            <img src={Logo} style={{ width: 74, height: 50 }} href="/" />
+                        <a class="navbar-item" style={{
+                            background: `url(${Logo}) no-repeat center center`,
+                            backgroundSize: "cover",
+                            width: 110, height: 55
+                        }} href="/">
                         </a>
                         <a
                             onClick={() => {
