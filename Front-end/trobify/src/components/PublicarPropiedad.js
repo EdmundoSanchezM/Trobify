@@ -15,7 +15,9 @@ class PublicarPropiedad extends Component {
         this.state = {
             isActive: false,
             dataImagen: '',
-            arrayImg: []
+            arrayImg: [],
+            countInputService: 1,
+            countInputDataProperty: 1
         };
         this.handleFiles = this.handleFiles.bind(this);
     }
@@ -97,13 +99,14 @@ class PublicarPropiedad extends Component {
         const images = imagesArr
         for (var i = 0; i < images.length; i++) {
             var div = document.createElement("div");
-            div.className = "column is-one-third"
+            div.className = "column is-one-third";
             var img = document.createElement("img");
             img.src = images[i].src;
             div.appendChild(img);
             element.appendChild(div)
         }
     }
+
     handleFiles = (e) => {
         console.clear()
         var urlsImg = this.state.arrayImg
@@ -125,10 +128,26 @@ class PublicarPropiedad extends Component {
         });
     }
 
-
+    addInput = (typeInput) => {
+        const target = document.getElementById(typeInput);
+        var id = typeInput === 'service' ? this.state.countInputService : this.state.countInputDataProperty
+        var field = document.createElement("div");
+        field.className = "field";
+        var control = document.createElement("div");
+        control.className = "control";
+        var input = document.createElement("input");
+        input.type = "text";
+        input.className = "input";
+        input.placeholder = typeInput === 'service' ? "Servicio" : "Dato";
+        input.id = typeInput === 'service' ? "service" + id : "dataProperty" + id;
+        control.appendChild(input);
+        field.appendChild(control);
+        target.appendChild(field);
+        id += 1;
+        if (typeInput === 'service') this.setState({ countInputService: id }); else this.setState({ countInputDataProperty: id });
+    }
 
     render() {
-
         return (
             <div>
                 <Navbar />
@@ -141,6 +160,59 @@ class PublicarPropiedad extends Component {
                             <div className="container has-text-centered">
                                 <Heading subtitle>Información de la propiedad</Heading>
                             </div>
+                            <div >
+                                <div class="field">
+                                    <label class="label">Servicios de la propiedad</label>
+                                    <div class="control">
+                                        <input class="input" type="text" id="service0" placeholder="Servicio" />
+                                    </div>
+                                </div>
+                                <div id="service"></div>
+                                <div class="field is-grouped is-grouped-right">
+                                    <button class="button is-primary" onClick={this.addInput.bind(this, 'service')}>Añadir servicio</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="field">
+                                    <label class="label">Datos del interior</label>
+                                    <div class="control">
+                                        <input class="input" type="text" id="dataProperty1" placeholder="Dato" />
+                                    </div>
+                                </div>
+                                <div id="dataProperty"></div>
+                                <div class="field is-grouped is-grouped-right">
+                                    <button class="button is-primary" onClick={this.addInput.bind(this, 'dataProperty')}>Añadir dato</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="field">
+                                    <label class="label">Condición</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="Condición de la propiedad" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="field">
+                                    <label class="label">Entrecalles en donde se encuentra la propiedad</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="Entrecalles de la propiedad" />
+                                    </div>
+                                </div>
+                                <h6 class="subtitle is-5"> </h6>
+                                <div class="field">
+                                    <label class="label">Referencias adicionales</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="Referencias adicionales" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                            <div class="box has-text-centered">
+                                <button class="button is-primary" onClick={this.addInput.bind(this, 'service')}>Anunciar propiedad</button>
+                            </div>
+                            </div>
+                            
                         </Columns.Column>
                         <Columns.Column>
                             <div className="container has-text-centered">
@@ -174,6 +246,9 @@ class PublicarPropiedad extends Component {
                                 <hr></hr>
                                 <div id="images-property" class="columns is-multiline has-background-info	">
                                 </div>
+                            </div>
+                            <div class="box has-text-centered">
+                                <button class="button is-primary" onClick={this.addInput.bind(this, 'service')}>Guardar propiedad</button>
                             </div>
                         </Columns.Column>
                     </Columns>
