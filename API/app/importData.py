@@ -129,7 +129,7 @@ data = pds.read_json ("cardList.json").convert_dtypes ()
 
 # Manejo de DB
 try:
-    conn = sqlite3.connect('../trobi.db')
+    conn = sqlite3.connect('../trobify.db')
     cursor = conn.cursor()
     print("Opened database successfully")
 
