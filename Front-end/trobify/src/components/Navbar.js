@@ -520,7 +520,7 @@ class Navbar extends Component {
                                 <div className="navbar-dropdown">
                                     <a className="navbar-item" href="/property_insert">Publicar propiedad</a>
                                     <a className="navbar-item">Jobs</a>
-                                    <a className="navbar-item" onClick={this.cita}>Crear Citas up</a>
+                                    <a className="navbar-item" href="/create_date">Crear Citas up</a>
                                     <a className="navbar-item" onClick={this.logout}>Cerrar sesión</a>
                                 </div>
                             </div>
