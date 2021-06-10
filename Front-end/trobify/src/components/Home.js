@@ -43,7 +43,7 @@ const Home = () => {
             <Section>
                 <div className="container has-text-centered">
                     <Heading>
-                        Trobify memo uwu
+                        Trobify 
                     </Heading>
                     {
                         forxd.map((forxd)=>{

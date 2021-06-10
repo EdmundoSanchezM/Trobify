@@ -4,7 +4,7 @@ import Home from './components/Home'
 import ConfirmarCuenta from './components/ConfirmarCuenta'
 import CrearCitas from './components/CrearCitas';
 import PublicarPropiedad from './components/PublicarPropiedad'
-
+import MapaUbicacionesPropiedades from './components/MapaUbicacionesPropiedades'
 const Routes = () =>{
     return(
         <Switch>
@@ -12,6 +12,7 @@ const Routes = () =>{
             <Route exact path='/' component={CrearCitas}/>
             <Route path='/confirmacion'  component={ConfirmarCuenta}/>
             <Route path='/property_insert' component={PublicarPropiedad}/>
+            <Route path='/map_properties' component={MapaUbicacionesPropiedades}/>
         </Switch>
     );
 }

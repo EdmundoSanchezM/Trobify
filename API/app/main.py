@@ -151,3 +151,24 @@ def sendConfimacionEmail(nombreUser, emailUser):
         }]
     )
     mail.send(msg)
+
+@app.route("/search", methods=['POST'])
+def prubabusqueda():
+    conn = db_conexion()
+    cursor = conn.cursor()
+    valor_buscar = "Ciudad De México" if ("Ciudad de México" == request.form['buscar'] )else request.form['buscar']
+    print(valor_buscar)
+    try:
+        cursor.execute(
+            'SELECT * FROM INMUEBLE ')
+        conn.commit()
+        inmueble = cursor.fetchall()
+        inmueble_valor_match = list(filter(lambda row: row[2].find(valor_buscar) != -1, inmueble))
+        datos_inmueble = ["Terreno: "+str(row[5])+" m² Hab: "+str(row[7]) for row in inmueble_valor_match]
+        geoloc_inmuebe = [row[3:5] for row in inmueble_valor_match]
+        dic = dict(zip(datos_inmueble, geoloc_inmuebe))
+        data_json = json.dumps(dic)
+        return data_json,200
+    except (sqlite3.Error, sqlite3.Warning) as e:
+        res = make_response(jsonify({"message": "No oK"}), 460)
+        return res

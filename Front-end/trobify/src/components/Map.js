@@ -209,7 +209,7 @@ class Map extends Component {
 
 
 	render() {
-		const AsyncMap = withScriptjs(
+		const AsyncMap = 
 			withGoogleMap(
 				props => (
 					<GoogleMap google={this.props.google}
@@ -249,7 +249,6 @@ class Map extends Component {
 					</GoogleMap>
 				)
 			)
-		);
 		let map;
 		if (this.props.center.lat !== undefined) {
 			map = <div>
@@ -260,7 +259,6 @@ class Map extends Component {
 					</div>
 				</div>
 				<AsyncMap
-					googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${GoogleMapsAPI}&libraries=places`}
 					loadingElement={
 						<div style={{ height: `100%` }} />
 					}
