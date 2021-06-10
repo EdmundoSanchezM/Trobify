@@ -13,11 +13,19 @@ class PublicarPropiedad extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isActive: false,
+            banimg: false,
             dataImagen: '',
             arrayImg: [],
-            countInputService: 1,
-            countInputDataProperty: 1
+            nombre:'',
+            estado:'renta',
+            terreno:'',
+            construccion:'',
+            habitaciones:'',
+            sanitarios:'',
+            estacionamientos:'',
+            referencias:'',
+
+            statusForm: [true, true, true, true, true, true, true]
         };
         this.handleFiles = this.handleFiles.bind(this);
     }
@@ -35,62 +43,6 @@ class PublicarPropiedad extends Component {
                     window.location.replace("/");
                 }
             });
-        /*         if (urlWindow.pathname.includes("confirmacion")) {
-                    const token = query.get('confirmation')
-                    var formData = new FormData();
-                    formData.append('mailConfirm', token);
-                    axios({
-                        method: "post",
-                        url: "http://127.0.0.1:5000/user/confirmationMail",
-                        data: formData,
-                        headers: { "Content-Type": "multipart/form-data" },
-                    })
-                        .then(function (response) {
-                            if (response.status === 200) {
-                                Swal.fire({
-                                    title: 'Confirmación realizada con exito',
-                                    text: 'Ahora pude ingresar a la plataforma :)',
-                                    icon: 'success',
-                                    confirmButtonText: 'Aceptar'
-                                })
-                                document.getElementById("opLeft").style.visibility = "hidden";
-                                document.getElementById("ncorreoC").style.display = "none"
-                                document.getElementById("correoC").style.display = "block"
-                            }
-                        })
-                        .catch(function (response) {
-                            if (response["response"].status === 460) {
-                                Swal.fire({
-                                    title: 'La confirmación no se pudo completar',
-                                    text: 'El correo a confirmar no esta registrado',
-                                    icon: 'error',
-                                    confirmButtonText: 'Aceptar'
-                                })
-                                document.getElementById("correoC").style.display = "none"
-                                document.getElementById("ncorreoC").style.display = "block"
-                            } else if (response["response"].status === 461) {
-                                Swal.fire({
-                                    title: 'Correo ya confirmado',
-                                    icon: 'success',
-                                    confirmButtonText: 'Aceptar'
-                                })
-                                document.getElementById("opLeft").style.visibility = "hidden";
-                                document.getElementById("ncorreoC").style.display = "none"
-                                document.getElementById("correoC").style.display = "block"
-                            }
-                            else {
-                                Swal.fire({
-                                    title: 'La confirmación no se pudo completar',
-                                    text: 'Ocurrrio un error en el servidor',
-                                    icon: 'error',
-                                    confirmButtonText: 'Aceptar'
-                                })
-                                document.getElementById("correoC").style.display = "none"
-                                document.getElementById("ncorreoC").style.display = "block"
-                            }
-                        });
-                }
-         */
     }
 
     allLoaded = (imagesArr) => {
@@ -134,36 +86,125 @@ class PublicarPropiedad extends Component {
             }
             imagesArr.push(image)
         });
+        this.setState({ banimg: true })
     }
 
-    addInput = (typeInput) => {
+    hacerRegistro = async () => {
+        var direccion='',lat='',lon=''
+        direccion=document.getElementById("address").value
+        lat=document.getElementById("lat").value
+        lon=document.getElementById("lon").value
         
-        const target = document.getElementById(typeInput);
-        var id = typeInput === 'service' ? this.state.countInputService : this.state.countInputDataProperty
-        if(id>2){
-            Swal.fire({
-                title: 'Maximo de entradas alcanzado',
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
-            });
-            return true
-        }
-        var field = document.createElement("div");
-        field.className = "field";
-        var control = document.createElement("div");
-        control.className = "control";
-        var input = document.createElement("input");
-        input.type = "text";
-        input.className = "input";
-        input.placeholder = typeInput === 'service' ? "Servicio" : "Dato";
-        input.id = typeInput === 'service' ? "service" + id : "dataProperty" + id;
-        control.appendChild(input);
-        field.appendChild(control);
-        target.appendChild(field);
-        id += 1;
-        if (typeInput === 'service') this.setState({ countInputService: id }); else this.setState({ countInputDataProperty: id });
-    }
+        var arrForm = this.state.statusForm
+        var boolArray = arrForm[0]
+        for (var i = 1; i < arrForm.length - 1; i++)
+            boolArray = boolArray && arrForm[i]
+        if (boolArray) {
+            if (this.state.nombre.length !== 0 && this.state.terreno.length !== 0 && this.state.construccion.length !== 0 && this.state.habitaciones.length !== 0 && this.state.sanitarios.length !== 0 && this.state.estacionamientos.length !== 0&&this.state.banimg) {
+                var formData = new FormData();
+                formData.append('Propietario', this.state.nombre);
+                formData.append('Nombre', this.state.estado);
+                formData.append('Direccion',direccion);
+                formData.append('Latitud', lat);
+                formData.append('Longitud', lon);
+                formData.append('Terreno', this.state.terreno);
+                formData.append('Construccion', this.state.construccion);
+                formData.append('Habitaciones', this.state.habitaciones);
+                formData.append('Sanitarios', this.state.sanitarios);
+                formData.append('Estacionamiento', this.state.estacionamientos);
+                formData.append('Descripcion', this.state.referencias);
+                let blob = await fetch(this.state.arrayImg[0]).then(r => r.blob());
+                formData.append('imgpropiedad', blob);
+                console.log(lat);
+                console.log(lon);
+                    axios({
+                        method: "post",
+                        url: "http://127.0.0.1:5000/user/altaPropiedad",
+                        data: formData,
+                        headers: { "Content-Type": "multipart/form-data" },
+                    })
+                        .then(function (response) {
+                            if (response.status === 201)
+                                Swal.fire({
+                                    title: 'Registro realizado con exito',
+                                    text: 'Porfavor de revisar su correo para poder confirmar su cuenta',
+                                    icon: 'success',
+                                    confirmButtonText: 'Aceptar'
+                                }).then(function (isConfirm) {
+                                    if (isConfirm) {
+                                        window.location.reload();
+                                    }
+                                });
+                        })
+                        .catch(function (response) {
+                            if (response["response"].status === 460)
+                                Swal.fire({
+                                    title: 'El registro no se pudo completar',
+                                    text: 'La propiedad ya ha sido registrada anteriormente',
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar'
+                                })
+                            else
+                                Swal.fire({
+                                    title: 'El registro no se pudo completar',
+                                    text: 'Ocurrrio un error en el servidor',
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar'
+                                })
+                        });
+            }else {
+                Swal.fire({
+                    title: 'Faltan campos que llenar',
+                    text: 'Porfavor de terminar el formulario',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                })
+            }
 
+            
+        }
+
+    }
+    manejadorPropietario = (event) => {
+        this.setState({
+          nombre: event.target.value
+        })
+    }
+    manejadorEstado = (event) => {
+        this.setState({
+          estado: event.target.value
+        })
+    }
+    manejadorTerreno = (event) => {
+        this.setState({
+          terreno: event.target.value
+        })
+    }
+    manejadorConstruccion = (event) => {
+        this.setState({
+          construccion: event.target.value
+        })
+    }
+    manejadorHabitaciones = (event) => {
+        this.setState({
+          habitaciones: event.target.value
+        })
+    }
+    manejadorSanitarios = (event) => {
+        this.setState({
+          sanitarios: event.target.value
+        })
+    }
+    manejadorEstacionamiento = (event) => {
+        this.setState({
+          estacionamientos: event.target.value
+        })
+    }
+    manejadorReferencias = (event) => {
+        this.setState({
+          referencias: event.target.value
+        })
+    }
     render() {
         return (
             <div>
@@ -177,74 +218,72 @@ class PublicarPropiedad extends Component {
                             <div className="container has-text-centered">
                                 <Heading subtitle>Información de la propiedad</Heading>
                             </div>
-                            <div >
-                                <div class="field">
-                                    <label class="label">Servicios de la propiedad</label>
-                                    <div class="control">
-                                        <input class="input" type="text" id="service0" placeholder="Servicio" />
+                            <div class="field">
+                                <label class="label">Correo del propietario</label>
+                                <div class="control">
+                                    <input class="input" type="text" placeholder="Propietario de la propiedad" onChange={this.manejadorPropietario}/>
+                                </div>
+                                <div class="columns">
+                                    <div class="column field is-grouped is-grouped-left">
+                                        <div>
+                                            <label class="label">Estado de la propiedad</label>
+                                            <select  class="select" value={this.state.estado} onChange={this.manejadorEstado}>
+                                                <option class="option"value="renta">Renta</option>
+                                                <option class="option"value="venta">Venta</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        </div>
+                                        <div>
+                                            <label class="label">m^2 de terreno</label>
+                                            <input class="input" type="number" placeholder="m^2 de terreno" onChange={this.manejadorTerreno}/>
+                                        </div>
+                                        <div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        </div>
+                                        <div>
+                                            <label class="label">m^2 de construccion</label>
+                                            <input class="input" type="number" placeholder="m^2 de construccion" onChange={this.manejadorConstruccion}/>
+                                        </div>
                                     </div>
+                                    
                                 </div>
-                                <div id="service"></div>
-                                <div class="field is-grouped is-grouped-right">
-                                    <button class="button is-primary" onClick={this.addInput.bind(this, 'service')}>Añadir servicio</button>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="field">
-                                    <label class="label">Datos del interior</label>
-                                    <div class="control">
-                                        <input class="input" type="text" id="dataProperty1" placeholder="Dato" />
+                                <div class="columns">
+                                    <div class="column field is-grouped is-grouped-left">
+                                        <div>
+                                            <label class="label">Número de habitaciones</label>
+                                            <input class="input" type="number" placeholder="Número de habitaciones" onChange={this.manejadorHabitaciones}/>
+                                        </div>
+                                        <div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        </div>
+                                        <div>
+                                            <label class="label">Número de sanitarios</label>
+                                            <input class="input" type="number" placeholder="Número de sanitarios" onChange={this.manejadorSanitarios}/>
+                                        </div>
+                                        <div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        </div>
+                                        <div>
+                                            <label class="label">Número de estacionamientos</label>
+                                            <input class="input" type="number" placeholder="Número de estacionamientos" onChange={this.manejadorEstacionamiento}/>
+                                        </div>
                                     </div>
-                                </div>
-                                <div id="dataProperty"></div>
-                                <div class="field is-grouped is-grouped-right">
-                                    <button class="button is-primary" onClick={this.addInput.bind(this, 'dataProperty')}>Añadir dato</button>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="field">
-                                    <label class="label">Condición</label>
-                                    <div class="control">
-                                        <input class="input" type="text" placeholder="Condición de la propiedad" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="field">
-                                    <label class="label">Entrecalles en donde se encuentra la propiedad</label>
-                                    <div class="control">
-                                        <input class="input" type="text" placeholder="Entrecalles de la propiedad" />
-                                    </div>
+                                    
                                 </div>
                             </div>
                             <div>
                                 <div class="field">
                                     <label class="label">Referencias adicionales</label>
                                     <div class="control">
-                                        <input class="input" type="text" placeholder="Referencias adicionales" />
+                                        <textarea class="textarea" type="text" placeholder="Referencias adicionales" onChange={this.manejadorReferencias}/>
                                     </div>
                                 </div>
                             </div>
-                            <div>
-                                <div class="box has-text-centered">
-                                    <button class="button is-primary" onClick={this.addInput.bind(this, 'service')}>Anunciar propiedad</button>
-                                </div>
-                            </div>
-
-                        </Columns.Column>
-                        <Columns.Column>
+                            
                             <div className="container has-text-centered">
-                                <Heading subtitle>Dirección de la propiedad</Heading>
-                            </div>
-                            <Map
-                                google={this.props.google}
-                                center={{ lat: 19.432777, lng: -99.133217 }}
-                                height="50vh"
-                                zoom={15}
-                            />
-                            <hr></hr>
-                            <div className="container has-text-centered">
-                                <Heading subtitle>Imágenes de la Propiedad</Heading>
+                                <label class="label">Imágenes de la Propiedad</label>
                             </div>
                             <div class="content is-centered">
                                 <div class="file has-name">
@@ -265,9 +304,24 @@ class PublicarPropiedad extends Component {
                                 <div id="images-property" class="columns is-multiline has-background-info	">
                                 </div>
                             </div>
-                            <div class="box has-text-centered">
-                                <button class="button is-primary" onClick={this.addInput.bind(this, 'service')}>Guardar propiedad</button>
+                            <div>
+                                <div class="box has-text-centered">
+                                    <button class="button is-primary" onClick={this.hacerRegistro}>Anunciar propiedad</button>
+                                </div>
                             </div>
+
+                        </Columns.Column>
+                        <Columns.Column>
+                            <div className="container has-text-centered">
+                                <Heading subtitle>Dirección de la propiedad</Heading>
+                            </div>
+                            <Map
+                                google={this.props.google}
+                                center={{ lat: 19.432777, lng: -99.133217 }}
+                                height="50vh"
+                                zoom={15}
+                            />
+                            <hr></hr>
                         </Columns.Column>
                     </Columns>
                 </Section>

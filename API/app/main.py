@@ -32,6 +32,37 @@ def db_conexion():
 def home_view():
     return "<h1>API uWu</h1>"
 
+@app.route("/user/altaPropiedad", methods=['POST'])
+def registrarPropiedad():
+    conn = db_conexion()
+    cursor = conn.cursor()
+    Propietario = request.form['Propietario']
+    Nombre = request.form['Nombre']
+    Direccion = request.form['Direccion']
+    Latitud = request.form['Latitud']
+    Longitud = request.form['Longitud']
+    Terreno = request.form['Terreno']
+    Construccion = request.form['Construccion']
+    NumHabitacion = request.form['Habitaciones']
+    NumSanitario = request.form['Sanitarios']
+    NumEstacionamiento = request.form['Estacionamiento']
+    Descripcion = request.form['Descripcion']
+    imgpropiedad = request.files.get('imgpropiedad',False)
+    data = [Propietario, Nombre, Direccion,
+            Latitud, Longitud, Terreno,Construccion,
+            NumHabitacion,NumSanitario,NumEstacionamiento,Descripcion,imgpropiedad.read()]
+    try:        
+        cursor.execute(
+            'insert into INMUEBLE values (?,?,?,?,?,?,?,?,?,?,?,?)', (*data,))
+        conn.commit()
+        res = make_response(jsonify({"message": "OK"}), 201)
+        return res
+    except (sqlite3.Error, sqlite3.Warning) as e:
+        res = make_response(jsonify({"message": "No oK"}), 460)
+        return res
+    res = make_response(jsonify({"message": "No ok"}), 400)
+    return res
+        
 
 @app.route("/user/register", methods=['POST'])
 def registrarUsuario():
