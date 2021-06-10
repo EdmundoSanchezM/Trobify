@@ -4,6 +4,13 @@ from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from writeToDB import writePageToDB
+import sys
+
+try:
+    pagesNum = int(sys.argv[1]) + 1
+except:
+    print ("No pages number argument found.")
+    exit ()
 
 urlStart = "https://century21mexico.com/busqueda/tipo_casa/operacion_"
 try:
@@ -17,15 +24,15 @@ except Exception as e:
     print (e)
     exit (0)
     
-'''for i in range(1, 50):
+for i in range(1, pagesNum):
     url = urlStart + "venta/pagina_" + str(i)
     driver.get(url)
     print ("Checking URL " + url + " ....")
     # page_source captura la página después de haber sido renderizada totalmente 
     propiedadesInfo = BeautifulSoup(driver.page_source, features='lxml')
-    writePageToDB (propiedadesInfo)'''
+    writePageToDB (propiedadesInfo)
     
-for i in range(1, 50):
+for i in range(1, pagesNum):
     url = urlStart + "renta/pagina_" + str(i)
     driver.get(url)
     print ("Checking URL " + url + " ....")

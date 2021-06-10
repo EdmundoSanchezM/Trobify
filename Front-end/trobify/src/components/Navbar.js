@@ -6,7 +6,8 @@ import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import axios from 'axios';
 import userData from 'UserProfile'
-/*Librerias del memo :v*/ 
+import BusquedaPropiedad from 'components/BusquedaPropiedad';
+/*Librerias del memo :v*/
 import { useHistory } from "react-router-dom";
 class Navbar extends Component {
     constructor(props) {
@@ -47,7 +48,7 @@ class Navbar extends Component {
         this.cita = this.cita.bind(this);
     }
 
-    cita  = () => {
+    cita = () => {
         window.location.href = '/';
         //No se como mandar a otra pagina unu, auida
     }
@@ -56,10 +57,10 @@ class Navbar extends Component {
         const nombreU = userData.getName()
         if (nombreU !== null && nombreU !== '') {
             document.getElementById("prueba").style.visibility = "visible"
-            document.getElementById("iniciarSesion").style.visibility = "hidden"
-            document.getElementById("opLeft").style.visibility = "hidden"
+            document.getElementById("iniciarSesion").style.display = "none"
+            document.getElementById("opLeft").style.display = "none"
         } else {
-            document.getElementById("prueba").style.visibility = "hidden"
+            document.getElementById("prueba").style.display = "none"
         }
 
     }
@@ -491,14 +492,7 @@ class Navbar extends Component {
                         className={`navbar-menu ${this.state.isActive ? "is-active" : ""}`}
                     >
                         <div class="navbar-end">
-                            <div class="navbar-item field">
-                                <p class="control has-icons-right">
-                                    <input class="input" type="text" placeholder="¿Qué estas buscando?" />
-                                    <span class="icon is-small is-right">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="#ddd" d="M23.822 20.88l-6.353-6.354c.93-1.465 1.467-3.2 1.467-5.059.001-5.219-4.247-9.467-9.468-9.467s-9.468 4.248-9.468 9.468c0 5.221 4.247 9.469 9.468 9.469 1.768 0 3.421-.487 4.839-1.333l6.396 6.396 3.119-3.12zm-20.294-11.412c0-3.273 2.665-5.938 5.939-5.938 3.275 0 5.94 2.664 5.94 5.938 0 3.275-2.665 5.939-5.94 5.939-3.274 0-5.939-2.664-5.939-5.939z" /></svg>
-                                    </span>
-                                </p>
-                            </div>
+                            <BusquedaPropiedad></BusquedaPropiedad>
                         </div>
                         <div class="navbar-end">
                             <a class="navbar-item" id="opLeft" ata-target="#modal" onClick={this.showModal}>
