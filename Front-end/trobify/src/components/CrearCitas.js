@@ -7,15 +7,15 @@ import axios from 'axios';
 import Swal from 'sweetalert2'
 import Map from 'components/Map'
 import Heading from 'react-bulma-components/lib/components/heading';
-
-
+import { GoogleMapsAPI } from '../credentials';
+import GoogleMapReact from 'google-map-react';
+import ubi from 'resources/images/Fotos_inicio/ubi.png';
+const AnyReactComponent = ({ text }) => <img width="40px" height="40px" src={ubi} />;
 class PublicarPropiedad extends Component {
-    state = {
-        infoVisible: true
-    }
     constructor(props) {
         super(props);
         this.state = {
+            infoVisible: true,
             isActive: false,
             dataImagen: '',
             arrayImg: [],
@@ -27,7 +27,7 @@ class PublicarPropiedad extends Component {
 
     componentDidMount() {
         this.setState({
-            infoVisible: true
+            infoVisible: false
         })
         const usuario = userData.getName();
         if (usuario == null)
@@ -181,7 +181,13 @@ class PublicarPropiedad extends Component {
             infoVisible: true
         })
     }
-
+    static defaultProps = {
+        center: {
+          lat: 19.432777,
+          lng: -99.133217
+        },
+        zoom: 30
+      };
     render() {
         const { infoVisible } = this.state
         return (
@@ -286,12 +292,24 @@ class PublicarPropiedad extends Component {
                             <div className="container has-text-centered">
                                 <Heading subtitle>Dirección de la propiedad</Heading>
                             </div>
-                            <Map
-                                google={this.props.google}
-                                center={{ lat: 19.432777, lng: -99.133217 }}
-                                height="50vh"
-                                zoom={15}
+                            <div style={{ height: '50vh', width: '100%' }}>
+                            <GoogleMapReact
+                                bootstrapURLKeys={{ key:GoogleMapsAPI }}
+                                defaultCenter={this.props.center}
+                                defaultZoom={this.props.zoom}
+                            >
+                            <AnyReactComponent
+                                lat={19.432777}
+                                lng={-99.133217}
+                                text="My Marsdker"
                             />
+                            <AnyReactComponent
+                                lat={19.432777}
+                                lng={-99.134217}
+                                text="My Marsdker"
+                            />
+                            </GoogleMapReact>
+                            </div>
                             <hr></hr>
                         
                         </Columns.Column>
