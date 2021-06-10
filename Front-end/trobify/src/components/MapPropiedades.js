@@ -36,6 +36,11 @@ class MapPropiedades extends Component {
         }
         this.setState({ markers: markers })
     }
+
+    onMarkerClick  = (event) => {
+		let newLat = event.latLng.lat(),
+			newLng = event.latLng.lng();
+	};
     render() {
 
         const AsyncMap =
@@ -54,6 +59,8 @@ class MapPropiedades extends Component {
                                     </div>
                                 </InfoWindow>
                                 <Marker
+                                    onClick={this.onMarkerClick}
+                                    clickable={true}
                                     google={this.props.google}
                                     draggable={false}
                                     position={{ lat: marker.lat, lng: marker.lng }}
