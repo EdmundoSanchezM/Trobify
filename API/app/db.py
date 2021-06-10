@@ -11,6 +11,6 @@ c.execute('''CREATE TABLE USUARIOS(
             [Numero] text not null, 
             [Contraseña] text not null, 
             [Tipo] integer default 0 not null, 
-            [Imagen] blob)''')        
+            [Imagen] blob)''')                      
                  
 conn.close()

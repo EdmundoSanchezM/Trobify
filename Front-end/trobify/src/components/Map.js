@@ -3,6 +3,8 @@ import { withGoogleMap, GoogleMap, withScriptjs, InfoWindow, Marker } from "reac
 import Geocode from "react-geocode";
 import Autocomplete from 'react-google-autocomplete';
 import { GoogleMapsAPI } from '../credentials';
+import Section from 'react-bulma-components/lib/components/section';
+import Columns from 'react-bulma-components/lib/components/columns';
 Geocode.setApiKey(GoogleMapsAPI);
 Geocode.enableDebug();
 
@@ -255,8 +257,12 @@ class Map extends Component {
 				<div class="field">
 					<label class="label">Dirección: </label>
 					<div class="control">
-						<input class="input" type="text" name="address" onChange={this.onChange} value={this.state.address} />
+						<input class="input" type="text" name="address" id="address" onChange={this.onChange} value={this.state.address} />
 					</div>
+					<div class="input-group">
+					<input class="form-control" type="text" type="hidden" name="address" id="lat"  value={this.state.markerPosition.lat} />
+					<input class="form-control" type="text" type="hidden" name="address" id="lon"  value={this.state.markerPosition.lng} />
+				</div>
 				</div>
 				<AsyncMap
 					loadingElement={
@@ -268,8 +274,11 @@ class Map extends Component {
 					mapElement={
 						<div style={{ height: `100%` }} />
 					}
+					
 				/>
+				
 			</div>
+			
 		} else {
 			map = <div style={{ height: this.props.height }} />
 		}

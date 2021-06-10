@@ -12,6 +12,7 @@ const Routes = () =>{
             <Route exact path='/' component={CrearCitas}/>
             <Route path='/confirmacion'  component={ConfirmarCuenta}/>
             <Route path='/property_insert' component={PublicarPropiedad}/>
+            <Route path='/create_date' component={CrearCitas}/>
             <Route path='/map_properties' component={MapaUbicacionesPropiedades}/>
         </Switch>
     );
