@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom';
 import Autocomplete from "react-google-autocomplete";
-import { GoogleMapsAPI } from '../credentials';
 
 class BusquedaPropiedad extends Component {
     constructor(props) {
