@@ -129,7 +129,7 @@ def writePageToDB (propiedadesInfo):
             imgDict[cardInfo["link"]] = img
 
         cardPriceInfo = i.find (class_='card-footer p-0 border-0 bg-transparent').find ('h5').text
-        cardInfo["price"] = float (parsePrice (cardPriceInfo))
+        cardInfo["price"] = str (parsePrice (cardPriceInfo))
         cardsList.append (cardInfo)
 
     # Con el diccionario listo, se crea un archivo JSON
@@ -138,7 +138,7 @@ def writePageToDB (propiedadesInfo):
     # Lectura de JSON
     try: 
         data = pds.read_json ("cardList.json").convert_dtypes ()
-        data["price"] = data["price"].astype (float)
+        data["price"] = data["price"].astype (str)
         print ("JSON successfully opened")
     except:
         raise Exception("Couldn't open JSON")
@@ -157,7 +157,6 @@ def writePageToDB (propiedadesInfo):
         '''try:
             with open ('c21.jpg', 'rb') as file:
                 binaryData = file.read ()
-
             query = """ INSERT OR IGNORE INTO USUARIOS (Nombre, Apellido, Correo, Numero, Contraseña, Tipo, Imagen)
                 VALUES (?,?,?,?,?,?,?) """
             cursor.execute (query, ("Century 21", "Real Estate LLC", "century21.realestate@century21.com", "5591827346", "Xx_c3n7uRy_21_Yy", 2, binaryData))
@@ -181,7 +180,7 @@ def writePageToDB (propiedadesInfo):
                 [NumSanitario] integer not null,
                 [NumEstacionamiento] integer not null,
                 [Descripcion] text not null,
-                [Precio] real default 0,
+                [Precio] text default 0,
                 [Imagen] blob default null,
                 
                 unique (Propietario, Latitud, Longitud),
