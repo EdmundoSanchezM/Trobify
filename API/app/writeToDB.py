@@ -2,6 +2,7 @@ import json
 import os
 import pandas as pds
 import re
+import requests
 import sqlite3
 import sys
 from bs4 import BeautifulSoup
@@ -52,6 +53,14 @@ def parseToString (propertyInfo, it):
     string = string[:j]
     return string
 
+def parsePrice (price):
+    res = str ()
+    for i in price:
+        if i.isnumeric ():
+            res = res + i
+
+    return res
+
 def getCardInfo (card):
     # Diccionario para guardar información de una propiedad
     cardInfo = {}
@@ -101,11 +110,26 @@ def writePageToDB (propiedadesInfo):
 
     # Arreglo que almacena la información de todas las tarjetas de propiedad
     cardsList = []
+    imgDict = {}
 
     for i in cards:
         # Ubicar la tarjeta de propiedad y almacenarla como objeto
         card = i.find (class_='row m-0').find (class_='col-sm-8 pt-2 px-2 pb-0')
         cardInfo = getCardInfo (card)
+
+        imgUrl = i.find (class_='image-gallery-image')['src']
+        try:
+            img = requests.get (imgUrl).content
+            if not img[:4] == b'\xff\xd8\xff\xe0':
+                raise Exception ("File not supported")
+        except Exception as e:
+            print (imgUrl, ": Error retrieiving thumbnail --", e)
+            img = None
+        finally:
+            imgDict[cardInfo["link"]] = img
+
+        cardPriceInfo = i.find (class_='card-footer p-0 border-0 bg-transparent').find ('h5').text
+        cardInfo["price"] = str (parsePrice (cardPriceInfo))
         cardsList.append (cardInfo)
 
     # Con el diccionario listo, se crea un archivo JSON
@@ -114,6 +138,7 @@ def writePageToDB (propiedadesInfo):
     # Lectura de JSON
     try: 
         data = pds.read_json ("cardList.json").convert_dtypes ()
+        data["price"] = data["price"].astype (str)
         print ("JSON successfully opened")
     except:
         raise Exception("Couldn't open JSON")
@@ -129,17 +154,16 @@ def writePageToDB (propiedadesInfo):
         # cursor.execute (""" DROP TABLE IF EXISTS INMUEBLE; """)    
         # cursor.execute ( """ DELETE FROM USUARIOS WHERE Correo="century21.realestate@century21.com"; """)
 
-        try:
+        '''try:
             with open ('c21.jpg', 'rb') as file:
                 binaryData = file.read ()
-
             query = """ INSERT OR IGNORE INTO USUARIOS (Nombre, Apellido, Correo, Numero, Contraseña, Tipo, Imagen)
                 VALUES (?,?,?,?,?,?,?) """
             cursor.execute (query, ("Century 21", "Real Estate LLC", "century21.realestate@century21.com", "5591827346", "Xx_c3n7uRy_21_Yy", 2, binaryData))
             conn.commit ()
         except sqlite3.Error as error1:
             #print("Failed inserting data into USUARIOS table: {}".format(error1))
-            raise Exception("Failed inserting data into USUARIOS table: {}".format(error1))
+            raise Exception("Failed inserting data into USUARIOS table: {}".format(error1))'''
 
         # primary key (Propietario, Id),
         # [Id] integer primary key,
@@ -156,6 +180,8 @@ def writePageToDB (propiedadesInfo):
                 [NumSanitario] integer not null,
                 [NumEstacionamiento] integer not null,
                 [Descripcion] text not null,
+                [Precio] text default 0,
+                [Imagen] blob default null,
                 
                 unique (Propietario, Latitud, Longitud),
                 constraint fk_Propietario
@@ -165,9 +191,23 @@ def writePageToDB (propiedadesInfo):
                     ON DELETE CASCADE
                 )''')
 
+        cursor.execute('''CREATE TABLE IF NOT EXISTS CITAS (
+                [Solicitante] text not null,
+                [Latitud] real not null,
+                [Longitud] real not null,
+                [Fecha_hora] text not null,
+                
+                unique (Solicitante, Latitud, Longitud),
+                constraint fk_Solicitante
+                    FOREIGN KEY (Solicitante)
+                    REFERENCES USUARIOS (Correo)
+                    ON UPDATE CASCADE
+                    ON DELETE CASCADE
+                )''')
+
         query = """ INSERT OR IGNORE INTO INMUEBLE (Propietario, Nombre, Direccion, Latitud, Longitud, Terreno, Construccion, NumHabitacion, NumSanitario,
-                                            NumEstacionamiento, Descripcion) 
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?) """
+                                            NumEstacionamiento, Descripcion, Precio, Imagen) 
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?) """
 
         # l[0] = Nombre
         # l[1] = Direccion
@@ -178,6 +218,8 @@ def writePageToDB (propiedadesInfo):
         # l[6] = Sanitarios
         # l[7] = Estacionamiento
         # l[8] = Descripcion
+        # l[9] = Precio
+        # l[10] = Imagen
         for row in data.index:
             l = []
             for col in data.columns:
@@ -186,7 +228,7 @@ def writePageToDB (propiedadesInfo):
             address = getAddress (l[2])
 
             if address != None:
-                cursor.execute (query, ("century21.realestate@century21.com", l[0], address[0], address[1][0], address[1][1], int(l[3]), int(l[4]), int(l[5]), int(l[6]), int(l[7]), l[8]))
+                cursor.execute (query, ("century21.realestate@century21.com", l[0], address[0], address[1][0], address[1][1], int(l[3]), int(l[4]), int(l[5]), int(l[6]), int(l[7]), l[8], l[9], imgDict[l[2]]))
                 conn.commit ()
 
         # cursor.execute ( """ DELETE FROM INMUEBLE WHERE Id is NULL; """)
