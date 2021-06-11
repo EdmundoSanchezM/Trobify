@@ -94,6 +94,10 @@ class PublicarPropiedad extends Component {
         direccion = document.getElementById("address").value
         lat = document.getElementById("lat").value
         lon = document.getElementById("lon").value
+        if (lat > 12) {
+            lat = parseFloat(lat).toFixed(12).toString();
+            lon = parseFloat(lon).toFixed(12).toString();
+        }
         var arrForm = this.state.statusForm
         var boolArray = arrForm[0]
         for (var i = 1; i < arrForm.length - 1; i++)

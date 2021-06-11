@@ -101,7 +101,10 @@ class Vercitas extends Component {
                     <br></br>
                     <div className="columns is-centered">
                         <div className="column">
-                            <table class="table">
+                            <table className="table" style={{
+                             marginLeft: 'auto',
+                             marginRight:'auto'
+                            }}>
                                 <thead>
                                     <tr>
                                         <th>Correo del interesado</th>
