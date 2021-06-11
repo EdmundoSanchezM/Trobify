@@ -289,13 +289,15 @@ def vercitas():
         propiedadesData['Lng'] = [i[4] for i in propiedades]
         allcitas = dict()
         contadorC = 0
-        for i in range(0, len(propiedadesData)):
+        xd = len(propiedadesData['Dirrecciónes'])
+        for i in range(0, xd):
             cita_dic = ""
             data = [propiedadesData['Lat'][i], propiedadesData['Lng'][i]]
             cursor.execute(
                 'SELECT * FROM CITAS where Latitud = ? or Longitud = ? ', (*data,))
             conn.commit()
             citas = cursor.fetchall()
+            print(data)
             if(len(citas) == 1):
                 for row in citas:
                     cita_dic += row[0] + "*"  # solicitante

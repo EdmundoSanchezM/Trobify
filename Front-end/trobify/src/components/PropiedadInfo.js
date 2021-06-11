@@ -90,8 +90,12 @@ class PropiedadInfo extends Component {
     }
     hacerRegistro = () => {
         const actualDate = new Date()
-        let latfix = this.state.Lat.toFixed(13);
-        let lngfix = this.state.Lng.toFixed(13);
+        let latfix = this.state.Lat;
+        let lngfix = this.state.Lng;
+        if (this.state.Lat > 12) {
+            latfix = this.state.Lat.toFixed(12);
+            lngfix = this.state.Lng.toFixed(12);
+        }
         if (actualDate < this.state.Cita) {
             var formData = new FormData();
             formData.append('Solicitante', UserData.getEmail());
