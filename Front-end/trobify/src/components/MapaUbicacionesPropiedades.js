@@ -8,14 +8,12 @@ import Map from 'components/MapPropiedades'
 import Heading from 'react-bulma-components/lib/components/heading';
 
 class MapaUbicacionesPropiedades extends Component {
-    constructor() {
-        super();
-    };
-    forceUpdateHandler() {
-        alert('Hola')
-        this.forceUpdate();
-    };
-
+    constructor(props) {
+        super(props);
+        this.state = {
+            redirect: false
+        };
+    }
     componentDidMount() {
         let dato = localStorage.getItem('dato')
         let stop_aux = localStorage.getItem('stop_aux')
@@ -34,13 +32,18 @@ class MapaUbicacionesPropiedades extends Component {
                     var coordenadas_data = Array.from(Object.values(propiedadesdata))
                     localStorage.setItem('direcciones_data', JSON.stringify(direcciones_data))
                     localStorage.setItem('coordenadas_data', JSON.stringify(coordenadas_data))
-                    if (direcciones_data.length === 0) {
+                    if (direcciones_data.length === 0 && stop_aux != 77) {
                         Swal.fire({
                             title: 'No hay propiedades',
                             text: 'Lo siento, no hay propiedades :c',
                             icon: 'error',
                             confirmButtonText: 'Aceptar'
-                        })
+                        }).then(function (isConfirm) {
+                            if (isConfirm && stop_aux != 10) {
+                                window.location.reload();
+                                localStorage.setItem("stop_aux", 77)
+                            }
+                        });
                         localStorage.removeItem('direcciones_data')
                         localStorage.removeItem('coordenadas_data')
                     } else {
