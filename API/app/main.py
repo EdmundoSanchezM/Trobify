@@ -102,8 +102,6 @@ def registrarUsuario():
         except (sqlite3.Error, sqlite3.Warning) as e:
             res = make_response(jsonify({"message": "No oK"}), 460)
             return res
-    res = make_response(jsonify({"message": "No ok"}), 400)
-    return res
 
 
 @app.route("/user/confirmationMail", methods=['POST'])
@@ -163,8 +161,11 @@ def iniciarSesionUsuario():
         for row in userConfirmado:
             userData['nombre'] = row[0]
             userData['apellido'] = row[1]
+            userData['correo'] = email
+            userData['movil'] = row[3]
             userData['tipo'] = row[5]
-            userData['imagen'] = b64encode(row[6]).decode('utf-8')
+            if row[6] is not None:
+                userData['imagen'] = b64encode(row[6]).decode('utf-8')
         if(len(userData) != 0):
             return jsonify(userData), 200
         else:
@@ -174,6 +175,35 @@ def iniciarSesionUsuario():
         res = make_response(jsonify({"message": "No oK"}), 460)
         return res
 
+@app.route("/user/update", methods=['POST'])
+def actualizarUser():
+    conn = db_conexion()
+    cursor = conn.cursor()
+    email = request.form['email']
+    telefono = request.form['telefono']
+    imageUser = request.files.get('imgUsuario', False)
+    userData = dict()
+    if imageUser:
+        data = [telefono, imageUser.read(), email]
+    else:
+        data = [telefono, None, email]
+    userData['movil'] = telefono
+    try:
+        cursor.execute(
+            'update USUARIOS set Numero=?, Imagen=? where Correo = ?', (*data,))
+        if imageUser:
+            data = [email]
+            cursor.execute(
+            'SELECT * FROM USUARIOS where Correo = ? ', (*data,))
+            conn.commit()
+            userConfirmado = cursor.fetchall()
+            for row in userConfirmado:
+                userData['imagen'] = b64encode(row[6]).decode('utf-8')
+        conn.commit()
+        return jsonify(userData), 200
+    except (sqlite3.Error, sqlite3.Warning) as e:
+        res = make_response(jsonify({"message": "No oK"}), 460)
+        return res
 
 def sendConfimacionEmail(nombreUser, emailUser):
     msg = Message(subject="Confirmacion de correo",
@@ -333,6 +363,23 @@ def borrarcitas():
         data = [lat,lng,solicitante]
         cursor.execute(
             'DELETE FROM CITAS where Latitud = ? and Longitud = ? and Solicitante = ?', (*data,))
+        conn.commit()
+        res = make_response(jsonify({"message": "Ok"}), 200)
+        return res
+    except (sqlite3.Error, sqlite3.Warning) as e:
+        res = make_response(jsonify({"message": "No oK"}), 460)
+        return res
+
+@app.route("/user/delete_account", methods=['POST'])
+def borrarcuenta():
+    conn = db_conexion()
+    cursor = conn.cursor()
+    email = request.form['email']
+    print(email)
+    data = [email]
+    try:
+        cursor.execute(
+            'DELETE FROM USUARIOS where Correo = ?', (*data,))
         conn.commit()
         res = make_response(jsonify({"message": "Ok"}), 200)
         return res

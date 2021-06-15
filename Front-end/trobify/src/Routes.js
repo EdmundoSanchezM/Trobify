@@ -6,6 +6,7 @@ import PublicarPropiedad from './components/PublicarPropiedad'
 import MapaUbicacionesPropiedades from './components/MapaUbicacionesPropiedades'
 import PropiedadInfo from 'components/PropiedadInfo';
 import Vercitas from 'components/Vercitas';
+import Configuracion from 'components/Configuracion';
 const Routes = () =>{
     return(
         <Switch>
@@ -15,6 +16,7 @@ const Routes = () =>{
             <Route path='/map_properties' component={MapaUbicacionesPropiedades}/>
             <Route path='/info_property' component={PropiedadInfo}/>
             <Route path='/view_dates' component={Vercitas}/>
+            <Route path='/settings' component={Configuracion}/>
         </Switch>
     );
 }

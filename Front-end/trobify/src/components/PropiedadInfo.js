@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2'
 import Navbar from 'components/Navbar';
@@ -207,7 +207,7 @@ class PropiedadInfo extends Component {
                                 <div className="column is-one-third">
                                     <img style={{
                                         content: `url(data:image/png;base64,${this.state.Imagen}) `,
-                                    }}></img>
+                                    }} alt="casa"></img>
                                 </div>
                             </div>
 

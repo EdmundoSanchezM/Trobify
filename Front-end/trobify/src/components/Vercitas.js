@@ -1,12 +1,9 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2'
 import Navbar from 'components/Navbar';
-import Map from 'components/MapInfo'
 import Heading from 'react-bulma-components/lib/components/heading';
 import Section from 'react-bulma-components/lib/components/section';
-import Columns from 'react-bulma-components/lib/components/columns';
-import DateTimePicker from 'react-datetime-picker'
 import UserData from 'UserProfile';
 
 class Vercitas extends Component {
