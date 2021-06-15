@@ -320,22 +320,23 @@ def vercitas():
         allcitas = dict()
         contadorC = 0
         xd = len(propiedadesData['Dirrecciónes'])
+        cita_dic = ""
         for i in range(0, xd):
-            cita_dic = ""
             data = [propiedadesData['Lat'][i], propiedadesData['Lng'][i]]
             cursor.execute(
                 'SELECT * FROM CITAS where Latitud = ? or Longitud = ? ', (*data,))
             conn.commit()
             citas = cursor.fetchall()
-            print(data)
-            if(len(citas) == 1):
+            if(len(citas) >= 1):
                 for row in citas:
                     cita_dic += row[0] + "*"  # solicitante
                     cita_dic += row[3]+"*"  # ['Fecha_hora'] = row[3]
-                # ['Dirreccion'] =
-                cita_dic += propiedadesData['Dirrecciónes'][i]
-                allcitas["Cita"+str(contadorC)] = cita_dic
-                contadorC += 1
+                    # ['Dirreccion'] =
+                    cita_dic += propiedadesData['Dirrecciónes'][i]
+                    allcitas["Cita"+str(contadorC)] = cita_dic
+                    contadorC += 1
+                    cita_dic = ""
+        print(allcitas)
         json_object = json.dumps(allcitas)
         return json_object, 200
     except (sqlite3.Error, sqlite3.Warning) as e:
