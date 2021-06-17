@@ -326,8 +326,8 @@ class PublicarPropiedad extends Component {
                                 <Heading subtitle>Dirección de la propiedad</Heading>
                             </div>
                             <div className=" field">
-                                    <label class="label">Precio de la casa en pesos mexicanos</label>
-                                    <input class="input" type="text" placeholder="Número de estacionamientos" value={this.state.precio} onChange={this.manejadorPrecio} />
+                                    <label class="label">Precio de la propiedad en pesos mexicanos</label>
+                                    <input class="input" type="text" placeholder="Precio de la propiedad" value={this.state.precio} onChange={this.manejadorPrecio} />
                             </div>
                             <Map
                                 google={this.props.google}
