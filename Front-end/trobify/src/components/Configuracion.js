@@ -111,10 +111,10 @@ class Configuracion extends Component {
                 headers: { "Content-Type": "multipart/form-data" },
             })
                 .then(function (response) {
-                    if (response.status === 201)
+                    if (response.status === 200) {
+                        UserData.setMovil(response.data.movil);
                         Swal.fire({
-                            title: 'Registro realizado con exito',
-                            text: 'Porfavor de revisar su correo para poder confirmar su cuenta',
+                            title: 'Datos actualizados con exito',
                             icon: 'success',
                             confirmButtonText: 'Aceptar'
                         }).then(function (isConfirm) {
@@ -122,9 +122,10 @@ class Configuracion extends Component {
                                 window.location.reload();
                             }
                         });
+                    }
                 })
                 .catch(function (response) {
-                    if (response["response"].status === 460)
+                    if (response.status === 460)
                         Swal.fire({
                             title: 'El registro no se pudo completar',
                             text: 'El correo que se intento usar ya esta en uso, use un correo diferente',
@@ -153,8 +154,7 @@ class Configuracion extends Component {
                             UserData.setImage(response.data.imagen);
                             UserData.setMovil(response.data.movil);
                             Swal.fire({
-                                title: 'Registro realizado con exito',
-                                text: 'Porfavor de revisar su correo para poder confirmar su cuenta',
+                                title: 'Datos actualizados con exito',
                                 icon: 'success',
                                 confirmButtonText: 'Aceptar'
                             }).then(function (isConfirm) {
