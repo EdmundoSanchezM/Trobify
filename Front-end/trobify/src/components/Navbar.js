@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { Link, Redirect } from 'react-router-dom';
 import Logo from 'resources/images/Logo.jpg'
 import Swal from 'sweetalert2'
 import Cropper from "react-cropper";
@@ -7,8 +6,7 @@ import "cropperjs/dist/cropper.css";
 import axios from 'axios';
 import userData from 'UserProfile'
 import BusquedaPropiedad from 'components/BusquedaPropiedad';
-/*Librerias del memo :v*/
-import { useHistory } from "react-router-dom";
+
 class Navbar extends Component {
     constructor(props) {
         super(props);
@@ -45,12 +43,6 @@ class Navbar extends Component {
         this.closeModal_IniciarSesion = this.closeModal_IniciarSesion.bind(this);
         this.iniciarSesion = this.iniciarSesion.bind(this);
         this.logout = this.logout.bind(this);
-        this.cita = this.cita.bind(this);
-    }
-
-    cita = () => {
-        window.location.href = '/';
-        //No se como mandar a otra pagina unu, auida
     }
 
     componentDidMount() {
@@ -82,7 +74,7 @@ class Navbar extends Component {
         if (typeof this.state.cropper !== "undefined") {
             this.setState({ cropData: this.state.cropper.getCroppedCanvas().toDataURL() },
                 () => {
-                    document.getElementById('msgImage').innerHTML = '<img src=' + this.state.cropData + ' id=putita />';
+                    document.getElementById('msgImage').innerHTML = '<img src=' + this.state.cropData + ' id=imguser />';
                     this.closeModal_image()
                 }
             );
@@ -429,9 +421,11 @@ class Navbar extends Component {
                             }
                         });
                         userData.setName(response.data.nombre);
-                        userData.setlast_name(response.data.apellido);
-                        userData.setType(response.data.tipo)
-                        userData.setImage(response.data.imagen)
+                        userData.setEmail(response.data.correo);
+                        userData.setType(response.data.tipo);
+                        userData.setImage(response.data.imagen);
+                        userData.setMovil(response.data.movil);
+                        userData.setLastName(response.data.apellido);
                     }
 
                 })
@@ -513,8 +507,8 @@ class Navbar extends Component {
                                 </a>
                                 <div className="navbar-dropdown">
                                     <a className="navbar-item" href="/property_insert">Publicar propiedad</a>
-                                    <a className="navbar-item">Jobs</a>
-                                    <a className="navbar-item" href="/create_date">Crear Citas up</a>
+                                    <a className="navbar-item" href="/view_dates">Ver peticiones de citas</a>
+                                    <a className="navbar-item" href="/settings">Configuración de cuenta</a>
                                     <a className="navbar-item" onClick={this.logout}>Cerrar sesión</a>
                                 </div>
                             </div>

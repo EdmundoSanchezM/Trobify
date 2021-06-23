@@ -7,7 +7,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2'
 import Map from 'components/Map'
 import Heading from 'react-bulma-components/lib/components/heading';
-
+import UserData from 'UserProfile';
 
 class PublicarPropiedad extends Component {
     constructor(props) {
@@ -16,16 +16,16 @@ class PublicarPropiedad extends Component {
             banimg: false,
             dataImagen: '',
             arrayImg: [],
-            nombre:'',
-            estado:'renta',
-            terreno:'',
-            construccion:'',
-            habitaciones:'',
-            sanitarios:'',
-            estacionamientos:'',
-            referencias:'',
-
-            statusForm: [true, true, true, true, true, true, true]
+            nombre: '',
+            estado: 'renta',
+            terreno: '',
+            construccion: '',
+            habitaciones: '',
+            sanitarios: '',
+            estacionamientos: '',
+            referencias: '',
+            precio: '',
+            statusForm: [true, true, true, true, true, true, true, true]
         };
         this.handleFiles = this.handleFiles.bind(this);
     }
@@ -62,7 +62,7 @@ class PublicarPropiedad extends Component {
     handleFiles = (e) => {
         console.clear()
         var urlsImg = this.state.arrayImg
-        if(urlsImg.length>2){
+        if (urlsImg.length > 2) {
             Swal.fire({
                 title: 'Maximo de imagenes alcanzado',
                 icon: 'error',
@@ -90,21 +90,24 @@ class PublicarPropiedad extends Component {
     }
 
     hacerRegistro = async () => {
-        var direccion='',lat='',lon=''
-        direccion=document.getElementById("address").value
-        lat=document.getElementById("lat").value
-        lon=document.getElementById("lon").value
-        
+        var direccion = '', lat = '', lon = ''
+        direccion = document.getElementById("address").value
+        lat = document.getElementById("lat").value
+        lon = document.getElementById("lon").value
+        if (lat > 12) {
+            lat = parseFloat(lat).toFixed(12).toString();
+            lon = parseFloat(lon).toFixed(12).toString();
+        }
         var arrForm = this.state.statusForm
         var boolArray = arrForm[0]
         for (var i = 1; i < arrForm.length - 1; i++)
             boolArray = boolArray && arrForm[i]
         if (boolArray) {
-            if (this.state.nombre.length !== 0 && this.state.terreno.length !== 0 && this.state.construccion.length !== 0 && this.state.habitaciones.length !== 0 && this.state.sanitarios.length !== 0 && this.state.estacionamientos.length !== 0&&this.state.banimg) {
+            if (this.state.precio!==0&&this.state.terreno.length !== 0 && this.state.construccion.length !== 0 && this.state.habitaciones.length !== 0 && this.state.sanitarios.length !== 0 && this.state.estacionamientos.length !== 0 && this.state.banimg) {
                 var formData = new FormData();
-                formData.append('Propietario', this.state.nombre);
+                formData.append('Propietario', UserData.getEmail());
                 formData.append('Nombre', this.state.estado);
-                formData.append('Direccion',direccion);
+                formData.append('Direccion', direccion);
                 formData.append('Latitud', lat);
                 formData.append('Longitud', lon);
                 formData.append('Terreno', this.state.terreno);
@@ -113,46 +116,46 @@ class PublicarPropiedad extends Component {
                 formData.append('Sanitarios', this.state.sanitarios);
                 formData.append('Estacionamiento', this.state.estacionamientos);
                 formData.append('Descripcion', this.state.referencias);
+                formData.append('Precio', this.state.precio);
                 let blob = await fetch(this.state.arrayImg[0]).then(r => r.blob());
                 formData.append('imgpropiedad', blob);
                 console.log(lat);
                 console.log(lon);
-                    axios({
-                        method: "post",
-                        url: "http://127.0.0.1:5000/user/altaPropiedad",
-                        data: formData,
-                        headers: { "Content-Type": "multipart/form-data" },
+                axios({
+                    method: "post",
+                    url: "http://127.0.0.1:5000/user/altaPropiedad",
+                    data: formData,
+                    headers: { "Content-Type": "multipart/form-data" },
+                })
+                    .then(function (response) {
+                        if (response.status === 201)
+                            Swal.fire({
+                                title: 'Registro realizado con exito',
+                                icon: 'success',
+                                confirmButtonText: 'Aceptar'
+                            }).then(function (isConfirm) {
+                                if (isConfirm) {
+                                    window.location.href = '/'
+                                }
+                            });
                     })
-                        .then(function (response) {
-                            if (response.status === 201)
-                                Swal.fire({
-                                    title: 'Registro realizado con exito',
-                                    text: 'Porfavor de revisar su correo para poder confirmar su cuenta',
-                                    icon: 'success',
-                                    confirmButtonText: 'Aceptar'
-                                }).then(function (isConfirm) {
-                                    if (isConfirm) {
-                                        window.location.reload();
-                                    }
-                                });
-                        })
-                        .catch(function (response) {
-                            if (response["response"].status === 460)
-                                Swal.fire({
-                                    title: 'El registro no se pudo completar',
-                                    text: 'La propiedad ya ha sido registrada anteriormente',
-                                    icon: 'error',
-                                    confirmButtonText: 'Aceptar'
-                                })
-                            else
-                                Swal.fire({
-                                    title: 'El registro no se pudo completar',
-                                    text: 'Ocurrrio un error en el servidor',
-                                    icon: 'error',
-                                    confirmButtonText: 'Aceptar'
-                                })
-                        });
-            }else {
+                    .catch(function (response) {
+                        if (response["response"].status === 460)
+                            Swal.fire({
+                                title: 'El registro no se pudo completar',
+                                text: 'La propiedad ya ha sido registrada anteriormente',
+                                icon: 'error',
+                                confirmButtonText: 'Aceptar'
+                            })
+                        else
+                            Swal.fire({
+                                title: 'El registro no se pudo completar',
+                                text: 'Ocurrrio un error en el servidor',
+                                icon: 'error',
+                                confirmButtonText: 'Aceptar'
+                            })
+                    });
+            } else {
                 Swal.fire({
                     title: 'Faltan campos que llenar',
                     text: 'Porfavor de terminar el formulario',
@@ -161,48 +164,74 @@ class PublicarPropiedad extends Component {
                 })
             }
 
-            
+
         }
 
     }
     manejadorPropietario = (event) => {
         this.setState({
-          nombre: event.target.value
+            nombre: event.target.value
         })
     }
     manejadorEstado = (event) => {
         this.setState({
-          estado: event.target.value
+            estado: event.target.value
         })
     }
-    manejadorTerreno = (event) => {
-        this.setState({
-          terreno: event.target.value
-        })
+    manejadorTerreno = (e) => {
+        const re = /^\d+(.\d{0,2})?$/
+        if (e.target.value === '' || re.test(e.target.value)) {
+            this.setState({ terreno: e.target.value })
+        }
+
     }
-    manejadorConstruccion = (event) => {
-        this.setState({
-          construccion: event.target.value
-        })
+    manejadorConstruccion = (e) => {
+        const re = /^\d+(.\d{0,2})?$/
+        if (e.target.value === '' || re.test(e.target.value)) {
+            this.setState({
+                construccion: e.target.value
+            })
+        }
+
     }
-    manejadorHabitaciones = (event) => {
-        this.setState({
-          habitaciones: event.target.value
-        })
+    manejadorPrecio = (e) => {
+        const re = /^\d+(.\d{0,2})?$/
+        if (e.target.value === '' || re.test(e.target.value)) {
+            this.setState({
+                precio: e.target.value
+            })
+        }
+
     }
-    manejadorSanitarios = (event) => {
-        this.setState({
-          sanitarios: event.target.value
-        })
+    manejadorHabitaciones = (e) => {
+        const re = /^[0-9\b]+$/
+        if (e.target.value === '' || re.test(e.target.value)) {
+            this.setState({
+                habitaciones: e.target.value
+            })
+        }
+
     }
-    manejadorEstacionamiento = (event) => {
-        this.setState({
-          estacionamientos: event.target.value
-        })
+    manejadorSanitarios = (e) => {
+        const re = /^[0-9\b]+$/
+        if (e.target.value === '' || re.test(e.target.value)) {
+            this.setState({
+                sanitarios: e.target.value
+            })
+        }
+
     }
-    manejadorReferencias = (event) => {
+    manejadorEstacionamiento = (e) => {
+        const re = /^[0-9\b]+$/
+        if (e.target.value === '' || re.test(e.target.value)) {
+            this.setState({
+                estacionamientos: e.target.value
+            })
+        }
+    }
+    manejadorReferencias = (e) => {
         this.setState({
-          referencias: event.target.value
+            referencias: e.target.value
         })
     }
     render() {
@@ -217,71 +246,52 @@ class PublicarPropiedad extends Component {
                         <Columns.Column size="half">
                             <div className="container has-text-centered">
                                 <Heading subtitle>Información de la propiedad</Heading>
+                                <br></br>
                             </div>
-                            <div class="field">
-                                <label class="label">Correo del propietario</label>
-                                <div class="control">
-                                    <input class="input" type="text" placeholder="Propietario de la propiedad" onChange={this.manejadorPropietario}/>
-                                </div>
-                                <div class="columns">
-                                    <div class="column field is-grouped is-grouped-left">
-                                        <div>
-                                            <label class="label">Estado de la propiedad</label>
-                                            <select  class="select" value={this.state.estado} onChange={this.manejadorEstado}>
-                                                <option class="option"value="renta">Renta</option>
-                                                <option class="option"value="venta">Venta</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                        </div>
-                                        <div>
-                                            <label class="label">m^2 de terreno</label>
-                                            <input class="input" type="number" placeholder="m^2 de terreno" onChange={this.manejadorTerreno}/>
-                                        </div>
-                                        <div>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                        </div>
-                                        <div>
-                                            <label class="label">m^2 de construccion</label>
-                                            <input class="input" type="number" placeholder="m^2 de construccion" onChange={this.manejadorConstruccion}/>
-                                        </div>
+                            <div className="columns is-multiline">
+                                <div className="column field">
+                                    <label className="label">Estado de la propiedad</label>
+                                    <div className="select">
+                                        <select value={this.state.estado} onChange={this.manejadorEstado}>
+                                            <option class="option" value="renta">Renta</option>
+                                            <option class="option" value="venta">Venta</option>
+                                        </select>
                                     </div>
-                                    
+
                                 </div>
-                                <div class="columns">
-                                    <div class="column field is-grouped is-grouped-left">
-                                        <div>
-                                            <label class="label">Número de habitaciones</label>
-                                            <input class="input" type="number" placeholder="Número de habitaciones" onChange={this.manejadorHabitaciones}/>
-                                        </div>
-                                        <div>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                        </div>
-                                        <div>
-                                            <label class="label">Número de sanitarios</label>
-                                            <input class="input" type="number" placeholder="Número de sanitarios" onChange={this.manejadorSanitarios}/>
-                                        </div>
-                                        <div>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                        </div>
-                                        <div>
-                                            <label class="label">Número de estacionamientos</label>
-                                            <input class="input" type="number" placeholder="Número de estacionamientos" onChange={this.manejadorEstacionamiento}/>
-                                        </div>
-                                    </div>
-                                    
+                                <div className="column field">
+                                    <label className="label">m<sup>2</sup> de terreno</label>
+                                    <input className="input" type="text" placeholder="m^2 de terreno" value={this.state.terreno} onChange={this.manejadorTerreno} />
+                                </div>
+                                <div className="column field">
+                                    <label class="label">m<sup>2</sup>  de construccion</label>
+                                    <input class="input" type="text" placeholder="m^2 de construccion" value={this.state.construccion} onChange={this.manejadorConstruccion} />
+                                </div>
+
+                            </div>
+                            <div className="columns is-multiline">
+                                <div className="column field">
+                                    <label class="label">Número de habitaciones</label>
+                                    <input class="input" type="text" placeholder="Número de habitaciones" value={this.state.habitaciones} onChange={this.manejadorHabitaciones} />
+                                </div>
+                                <div className="column field">
+                                    <label class="label">Número de sanitarios</label>
+                                    <input class="input" type="text" placeholder="Número de sanitarios" value={this.state.sanitarios} onChange={this.manejadorSanitarios} />
+                                </div>
+                                <div className="column field">
+                                    <label class="label">Número de estacionamientos</label>
+                                    <input class="input" type="text" placeholder="Número de estacionamientos" value={this.state.estacionamientos} onChange={this.manejadorEstacionamiento} />
                                 </div>
                             </div>
                             <div>
                                 <div class="field">
                                     <label class="label">Referencias adicionales</label>
                                     <div class="control">
-                                        <textarea class="textarea" type="text" placeholder="Referencias adicionales" onChange={this.manejadorReferencias}/>
+                                        <textarea class="textarea" type="text" placeholder="Referencias adicionales" onChange={this.manejadorReferencias} />
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="container has-text-centered">
                                 <label class="label">Imágenes de la Propiedad</label>
                             </div>
@@ -314,6 +324,10 @@ class PublicarPropiedad extends Component {
                         <Columns.Column>
                             <div className="container has-text-centered">
                                 <Heading subtitle>Dirección de la propiedad</Heading>
+                            </div>
+                            <div className=" field">
+                                    <label class="label">Precio de la propiedad en pesos mexicanos</label>
+                                    <input class="input" type="text" placeholder="Precio de la propiedad" value={this.state.precio} onChange={this.manejadorPrecio} />
                             </div>
                             <Map
                                 google={this.props.google}

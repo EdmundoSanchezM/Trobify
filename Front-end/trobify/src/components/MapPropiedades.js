@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { withGoogleMap, GoogleMap, InfoWindow, Marker } from "react-google-maps";
 import Geocode from "react-geocode";
 import { GoogleMapsAPI } from '../credentials';
+import { Redirect } from 'react-router-dom';
+
 Geocode.setApiKey(GoogleMapsAPI);
 Geocode.enableDebug();
 
@@ -17,7 +19,10 @@ class MapPropiedades extends Component {
                 lat: 0,
                 lng: 0,
                 info: "laquetecuento"
-            }]
+            }],
+            Lat: 0,
+            Lng: 0,
+            redirect: false
         };
     }
 
@@ -37,11 +42,23 @@ class MapPropiedades extends Component {
         this.setState({ markers: markers })
     }
 
-    onMarkerClick  = (event) => {
-		let newLat = event.latLng.lat(),
-			newLng = event.latLng.lng();
-	};
+    onMarkerClick = (event) => {
+        let markerLat = event.latLng.lat(),
+            markerLng = event.latLng.lng();
+        this.setState({ redirect: true, Lat: markerLat, Lng: markerLng })
+
+    };
     render() {
+        const { redirect } = this.state;
+        const { Lat } = this.state;
+        const { Lng } = this.state;
+        if (redirect) {
+            return <Redirect to={{
+                pathname: '/info_property',
+                state: { Lat: Lat, Lng: Lng }
+            }}
+            />
+        }
 
         const AsyncMap =
             withGoogleMap(
@@ -80,7 +97,7 @@ class MapPropiedades extends Component {
                         <div style={{ height: `100%` }} />
                     }
                     containerElement={
-                        <div style={{ height: this.props.height}} />
+                        <div style={{ height: this.props.height }} />
                     }
                     mapElement={
                         <div style={{ height: `100%` }} />

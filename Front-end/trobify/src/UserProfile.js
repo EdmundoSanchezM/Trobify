@@ -1,8 +1,10 @@
 var UserProfile = (function () {
   var name = "";
-  var last_name = "";
-  var type = 0
+  var Email = "";
+  var type = 0;
   var data_Image = "";
+  var numero_cel = 0;
+  var lastname = "";
 
   var getName = function () {
     return localStorage.getItem('nombre');
@@ -12,12 +14,20 @@ var UserProfile = (function () {
     name = localStorage.setItem('nombre', name_P)
   };
 
-  var getlast_name = function () {
+  var getLastName = function () {
     return localStorage.getItem('apellido');
   };
 
-  var setlast_name = function (lastName) {
-    last_name = localStorage.setItem('apellido', lastName)
+  var setLastName = function (last_name) {
+    lastname = localStorage.setItem('apellido', last_name)
+  };
+
+  var getEmail = function () {
+    return localStorage.getItem('Email');
+  };
+
+  var setEmail = function (Email) {
+    Email = localStorage.setItem('Email', Email)
 
   };
 
@@ -39,15 +49,27 @@ var UserProfile = (function () {
     data_Image = localStorage.setItem('imagen', image)
   }
 
+  var getMovil = function () {
+    return localStorage.getItem('numero_cel');
+
+  };
+
+  var setMovil = function (numero_cel) {
+    data_Image = localStorage.setItem('numero_cel', numero_cel)
+  }
   return {
     getName: getName,
     setName: setName,
-    getlast_name: getlast_name,
-    setlast_name: setlast_name,
+    getEmail: getEmail,
+    setEmail: setEmail,
     getType: getType,
     setType: setType,
     getImage: getImage,
-    setImage: setImage
+    setImage: setImage,
+    getMovil : getMovil,
+    setMovil : setMovil,
+    getLastName : getLastName,
+    setLastName : setLastName
   }
 
 })();
