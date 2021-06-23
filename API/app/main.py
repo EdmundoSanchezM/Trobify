@@ -13,8 +13,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 # Para enviar correos, por el momento sera mi cuenta fake xd
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'josue.sanchez.batiz.9@gmail.com'
-app.config['MAIL_PASSWORD'] = 'edmundocsgo'
+app.config['MAIL_USERNAME'] = '***********'
+app.config['MAIL_PASSWORD'] = '***********'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
